@@ -46,7 +46,7 @@ const themeChange = () => {
         >
           <div class="flex items-center relative text-white">
             <img src="@/assets/imgs/logo.png" alt="" class="w-48px h-48px mr-10px" />
-            <span class="text-20px font-bold">Web应用防火墙</span>
+            <span class="text-20px font-bold">证书中心</span>
           </div>
           <div class="flex justify-center items-center h-[calc(100%-60px)]">
             <TransitionGroup

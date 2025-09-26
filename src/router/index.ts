@@ -11,7 +11,7 @@ export const constantRouterMap: AppRouteRecordRaw[] = [
   {
     path: '/',
     component: Layout,
-    redirect: '/websiteSettings/index',
+    redirect: '/certificateManagement/index',
     name: 'Root',
     meta: {
       hidden: true
@@ -81,52 +81,17 @@ export const constantRouterMap: AppRouteRecordRaw[] = [
 
 export const asyncRouterMap: AppRouteRecordRaw[] = [
   {
-    path: '/websiteSettings',
+    path: '/certificateManagement',
     component: Layout,
-    name: 'WebsiteSettings',
-    meta: {},
-    redirect: '/websiteSettings/index',
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/websiteSettings/websiteSetting.vue'),
-        name: 'websiteSettingsList',
-        meta: {
-          title: '网站设置',
-          icon: 'vi-ep:management'
-        }
-      }
-    ]
-  },
-  {
-    path: '/vulnerabilityProtection',
-    component: Layout,
-    name: 'VulnerabilityProtection',
+    name: 'CertificateManagement',
     meta: {},
     children: [
       {
         path: 'index',
-        component: () => import('@/views/VulnerabilityProtection/index.vue'),
-        name: 'vulnerabilityProtectionList',
+        component: () => import('@/views/certificateManagement/index.vue'),
+        name: 'certificateManagementList',
         meta: {
-          title: '漏洞防护',
-          icon: 'vi-ic:outline-webhook'
-        }
-      }
-    ]
-  },
-  {
-    path: '/logManagement',
-    component: Layout,
-    name: 'LogManagement',
-    meta: {},
-    children: [
-      {
-        path: 'index',
-        // component: () => import('@/views/Dashboard/Analysis.vue'),
-        name: 'LogManagementList',
-        meta: {
-          title: '日志管理',
+          title: '证书管理',
           icon: 'vi-clarity:document-solid'
         }
       }

@@ -15,7 +15,9 @@ import { createStyleImportPlugin, ElementPlusResolve } from 'vite-plugin-style-i
 import UnoCSS from 'unocss/vite'
 import { visualizer } from 'rollup-plugin-visualizer'
 import qiankun from 'vite-plugin-qiankun'
-
+import AutoImport from 'unplugin-auto-import/vite'
+import Components from 'unplugin-vue-components/vite'
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 // https://vitejs.dev/config/
 const root = process.cwd()
 
@@ -34,6 +36,12 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
   return {
     base: env.VITE_BASE_PATH,
     plugins: [
+      AutoImport({
+        resolvers: [ElementPlusResolver()]
+      }),
+      Components({
+        resolvers: [ElementPlusResolver()]
+      }),
       Vue({
         script: {
           // 开启defineModel
@@ -45,20 +53,20 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       progress(),
       env.VITE_USE_ALL_ELEMENT_PLUS_STYLE === 'false'
         ? createStyleImportPlugin({
-          resolves: [ElementPlusResolve()],
-          libs: [
-            {
-              libraryName: 'element-plus',
-              esModule: true,
-              resolveStyle: (name) => {
-                if (name === 'click-outside') {
-                  return ''
+            resolves: [ElementPlusResolve()],
+            libs: [
+              {
+                libraryName: 'element-plus',
+                esModule: true,
+                resolveStyle: (name) => {
+                  if (name === 'click-outside') {
+                    return ''
+                  }
+                  return `element-plus/es/components/${name.replace(/^el-/, '')}/style/css`
                 }
-                return `element-plus/es/components/${name.replace(/^el-/, '')}/style/css`
               }
-            }
-          ]
-        })
+            ]
+          })
         : undefined,
       EslintPlugin({
         cache: false,
@@ -79,28 +87,25 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       PurgeIcons(),
       env.VITE_USE_MOCK === 'true'
         ? viteMockServe({
-          ignore: /^\_/,
-          mockPath: 'mock',
-          localEnabled: !isBuild,
-          prodEnabled: isBuild,
-          injectCode: `
+            ignore: /^\_/,
+            mockPath: 'mock',
+            localEnabled: !isBuild,
+            prodEnabled: isBuild,
+            injectCode: `
           import { setupProdMockServer } from '../mock/_createProductionServer'
 
           setupProdMockServer()
           `
-        })
+          })
         : undefined,
       ViteEjsPlugin({
         title: env.VITE_APP_TITLE
       }),
       UnoCSS(),
       qiankun('waf', {
-        useDevMode: true, // 开发模式下 true，子应用可以独立运行
-      }),
+        useDevMode: true // 开发模式下 true，子应用可以独立运行
+      })
     ],
-  build: {
-    outDir: 'dist',
-  },
     css: {
       preprocessorOptions: {
         less: {
@@ -147,7 +152,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       cssTarget: ['chrome31']
     },
     server: {
-      port: 4000,
+      port: 4001,
       proxy: {
         // 选项写法
         '/api': {
@@ -160,7 +165,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
         overlay: false
       },
       host: '0.0.0.0',
-      origin: 'http://localhost:4000',
+      origin: 'http://localhost:4001'
     },
     optimizeDeps: {
       include: [

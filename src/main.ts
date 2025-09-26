@@ -35,6 +35,7 @@ import { setupPermission } from './directives'
 import { createApp } from 'vue'
 
 import App from './App.vue'
+import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 
 import './permission'
 
@@ -49,7 +50,9 @@ async function render(props: any = {}) {
   setupElementPlus(app)
   setupRouter(app)
   setupPermission(app)
-
+  for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+    app.component(key, component)
+  }
   // qiankun 下，容器要挂到 props.container 内部
   app.mount(props.container ? props.container.querySelector('#app') : '#app')
 }

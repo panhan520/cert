@@ -73,7 +73,7 @@ watch(
           }
         ]"
       >
-        Web应用防火墙
+        证书中心
       </div>
     </router-link>
   </div>
