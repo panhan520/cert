@@ -11,12 +11,14 @@ body {
 .layout-border__right:after {
   background-color: transparent !important;
 }
+// 卡片
 .el-card {
   border: none !important;
 }
 .el-card__header {
   border-bottom: none !important;
 }
+// 菜单
 .el-menu {
   padding: 4px 12px !important;
 }
@@ -32,6 +34,7 @@ body {
 .el-menu .el-menu-item.is-active {
   font-weight: bold;
 }
+// 表格
 .el-table--border .el-table__cell {
   border-right: none !important;
 }
@@ -43,6 +46,7 @@ body {
 .el-table {
   border-radius: 4px;
   font-size: 13px !important;
+  margin: 20px 0;
 }
 .el-table--border .el-table__cell {
   color: #0c0d0e !important;
@@ -50,6 +54,7 @@ body {
 .el-table .cell {
   font-size: 12px !important;
 }
+// tab切换
 .el-tabs__item {
   background-color: #f6f8fa !important;
   border-radius: 4px 4px 0 0 !important;
@@ -65,6 +70,7 @@ body {
   border-bottom: 2px solid #ffffff !important;
   background-color: #ffffff !important;
 }
+// 弹框
 .el-dialog {
   display: flex;
   flex-direction: column;
@@ -86,18 +92,29 @@ body {
   border-top: none !important;
   padding-top: 0 !important;
 }
+// 按钮
 .el-button {
   font-size: 13px !important;
 }
 .el-button--small {
   font-size: 12px !important;
 }
+.button-text {
+  color: rgba(22, 100, 255) !important;
+  cursor: pointer;
+}
+// 输入框
 .el-input__inner {
   font-size: 13px !important;
 }
+// 下拉框
 .el-select__wrapper {
   font-size: 13px !important;
 }
+.el-select-dropdown__item {
+  font-size: 13px !important;
+}
+// 多行文本框
 .el-textarea__inner {
   font-size: 13px !important;
 }
@@ -109,6 +126,10 @@ body {
   font-weight: 500;
 }
 // 单选按钮
+.el-radio__label {
+  font-size: 13px !important;
+  font-weight: 400;
+}
 .el-radio-button,
 .el-radio-button__inner {
   margin-right: 8px;
@@ -129,7 +150,17 @@ body {
   + .el-radio-button__inner {
   border: 1px solid #a2c1ff !important;
 }
+// 复选框
+.el-checkbox__label {
+  font-size: 13px !important;
+  font-weight: 400;
+}
 // 表单
 .el-form-item__label {
   font-size: 13px !important;
+}
+// Tooltip 文字提示
+.el-tooltip__popper {
+  max-width: 300px !important;
+  white-space: normal;
 }

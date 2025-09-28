@@ -1,5 +1,4 @@
 <template>
-  <!-- 抽屉 -->
   <el-dialog
     v-model="visible"
     width="900"
@@ -13,7 +12,7 @@
         <span>上传证书</span>
         <!-- 提示信息 -->
         <div class="info">
-          <el-icon><InfoFilled color="#1759dd" /></el-icon>
+          <el-icon><WarningFilled color="#1759dd" /></el-icon>
           <ul>
             <li>
               您可以将第三方证书服务商处导出的证书上传托管至火山引擎证书中心，便于统一管理及使用。
@@ -125,14 +124,14 @@
           </div>
         </el-form-item>
         <el-form-item label="备注名称" prop="name">
-          <el-input v-model="ruleForm.name" />
+          <el-input v-model="ruleForm.name" maxlength="68" />
         </el-form-item>
         <el-form-item label="标签">
           <template #label>
             <span
               >标签
               <el-tooltip
-                content="支持通过标签标记资源，从不同维度实现云资源分类与聚合，详情参考标签管理"
+                content="支持通过标签标记资源，从不同维度实现云资源分类与聚合。"
                 placement="top"
                 effect="light"
               >
@@ -140,36 +139,7 @@
               </el-tooltip>
             </span>
           </template>
-          <div v-if="ruleForm.tag.length > 0" class="form-item-tag">
-            <template v-for="(tag, index) in ruleForm.tag" :key="index">
-              <el-select
-                v-model="ruleForm.tag[index].label"
-                filterable
-                allow-create
-                placeholder="标签键"
-              >
-                <el-option label="111" value="111" />
-                <el-option label="123" value="123" />
-              </el-select>
-              <el-select
-                v-model="ruleForm.tag[index].value"
-                filterable
-                allow-create
-                placeholder="标签值"
-                :disabled="!ruleForm.tag[index].label"
-              >
-                <el-option label="111" value="111" />
-                <el-option label="123" value="123" />
-              </el-select>
-              <el-icon class="cursor-pointer" @click="removeTag(index)"><Delete /></el-icon>
-            </template>
-          </div>
-          <p class="add-tag">
-            <span @click="addTag">
-              <el-icon><CirclePlus /></el-icon> 添加标签
-            </span>
-            <span> 还可添加 {{ 50 - ruleForm.tag.length }} 个标签 </span>
-          </p>
+          <TagInput v-model="ruleForm.tags" />
         </el-form-item>
         <el-form-item label="允许上传相同证书" prop="allowDuplicate">
           <div class="form-item-switch">
@@ -214,8 +184,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, toRaw } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
+import TagInput from '../TagInput/index.vue'
 const props = defineProps({
   visible: {
     type: Boolean,
@@ -227,11 +198,6 @@ const visible = computed({
   get: () => props.visible,
   set: (val) => emit('update:visible', val)
 })
-interface TagItem {
-  label: string
-  value: string
-  isOpen: boolean
-}
 const ruleFormRef = ref<FormInstance>()
 const ruleForm = reactive({
   standards: 'gj', // 国际标准
@@ -243,9 +209,7 @@ const ruleForm = reactive({
   name: '上传证书',
   allowDuplicate: false,
   integrityCheckEnabled: true,
-  tag: [
-    // { value: '', label: '' }
-  ] as TagItem[]
+  tags: []
 })
 const rules = reactive<FormRules>({
   standard: [{ required: true, trigger: 'change' }],
@@ -283,17 +247,6 @@ const rules = reactive<FormRules>({
     }
   ]
 })
-// 添加标签
-const addTag = () => {
-  if (ruleForm.tag.length < 50) {
-    ruleForm.tag.push({ label: '', value: '', isOpen: false })
-  }
-}
-
-// 删除标签
-const removeTag = (index: number) => {
-  ruleForm.tag.splice(index, 1)
-}
 const handleFileChange = (file: any) => {
   ruleForm.certFile = file.raw
 }
@@ -304,6 +257,8 @@ const resetForm = (formEl: FormInstance | undefined) => {
 }
 // 表单提交
 const submitForm = async (formEl: FormInstance | undefined) => {
+  const payload = toRaw(ruleForm)
+  console.log(payload)
   if (!formEl) return
   await formEl.validate((valid, fields) => {
     if (valid) {
@@ -354,33 +309,6 @@ const handleCancel = (formEl: FormInstance | undefined) => {
 .form-item-switch {
   width: 100%;
   margin-top: 4px;
-}
-.form-item-tag {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  flex-wrap: wrap;
-  ::v-deep {
-    .el-select {
-      width: 216px;
-    }
-  }
-}
-.add-tag {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 13px;
-  > span:nth-child(1) {
-    display: flex;
-    gap: 5px;
-    color: rgb(22, 100, 255);
-    align-items: center;
-    margin-right: 8px;
-    cursor: pointer;
-  }
 }
 .cursor-pointer {
   cursor: pointer;

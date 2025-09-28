@@ -27,10 +27,12 @@ declare module 'vue' {
     Echart: typeof import('./src/components/Echart/src/Echart.vue')['default']
     Editor: typeof import('./src/components/Editor/src/Editor.vue')['default']
     ElButton: typeof import('element-plus/es')['ElButton']
+    ElCheckbox: typeof import('element-plus/es')['ElCheckbox']
     ElDialog: typeof import('element-plus/es')['ElDialog']
     ElForm: typeof import('element-plus/es')['ElForm']
     ElFormItem: typeof import('element-plus/es')['ElFormItem']
     ElIcon: typeof import('element-plus/es')['ElIcon']
+    ElInpunt: typeof import('element-plus/es')['ElInpunt']
     ElInput: typeof import('element-plus/es')['ElInput']
     ElOption: typeof import('element-plus/es')['ElOption']
     ElPopover: typeof import('element-plus/es')['ElPopover']
@@ -73,6 +75,7 @@ declare module 'vue' {
     SizeDropdown: typeof import('./src/components/SizeDropdown/src/SizeDropdown.vue')['default']
     Table: typeof import('./src/components/Table/src/Table.vue')['default']
     TableActions: typeof import('./src/components/Table/src/components/TableActions.vue')['default']
+    TableToolbar: typeof import('./src/components/TableToolbar/src/TableToolbar.vue')['default']
     TabMenu: typeof import('./src/components/TabMenu/src/TabMenu.vue')['default']
     TagsView: typeof import('./src/components/TagsView/src/TagsView.vue')['default']
     ThemeSwitch: typeof import('./src/components/ThemeSwitch/src/ThemeSwitch.vue')['default']
@@ -81,5 +84,8 @@ declare module 'vue' {
     VideoPlayer: typeof import('./src/components/VideoPlayer/src/VideoPlayer.vue')['default']
     VideoPlayerViewer: typeof import('./src/components/VideoPlayerViewer/src/VideoPlayerViewer.vue')['default']
     Waterfall: typeof import('./src/components/Waterfall/src/Waterfall.vue')['default']
+  }
+  export interface GlobalDirectives {
+    vLoading: typeof import('element-plus/es')['ElLoadingDirective']
   }
 }
