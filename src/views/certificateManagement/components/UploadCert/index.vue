@@ -99,9 +99,9 @@
             class="upload-demo"
             drag
             action="#"
-            accept=".crt,.pem"
+            accept=".key,.pem"
             :auto-upload="false"
-            :on-change="handleFileChange"
+            :on-change="handleFileChangeKey"
           >
             <el-icon class="el-icon--upload"><upload-filled /></el-icon>
             <div class="el-upload__text">点击或拖拽文件到此处上传</div>
@@ -212,7 +212,7 @@ const ruleForm = reactive({
   tags: []
 })
 const rules = reactive<FormRules>({
-  standard: [{ required: true, trigger: 'change' }],
+  standards: [{ required: true, trigger: 'change' }],
   algorithm: [
     {
       required: true,
@@ -247,8 +247,21 @@ const rules = reactive<FormRules>({
     }
   ]
 })
-const handleFileChange = (file: any) => {
-  ruleForm.certFile = file.raw
+const handleFileChange = (uploadFile: any) => {
+  if (!uploadFile.raw) return
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    ruleForm.certificatePem = e.target?.result as string
+  }
+  reader.readAsText(uploadFile.raw)
+}
+const handleFileChangeKey = (uploadFile: any) => {
+  if (!uploadFile.raw) return
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    ruleForm.privateKeyPem = e.target?.result as string
+  }
+  reader.readAsText(uploadFile.raw)
 }
 // 表单重置
 const resetForm = (formEl: FormInstance | undefined) => {

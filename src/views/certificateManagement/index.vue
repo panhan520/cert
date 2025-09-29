@@ -28,70 +28,75 @@
     <el-table :data="tableData" row-key="id" border>
       <el-table-column prop="name" label="证书名称">
         <template #default="scope">
-          {{ scope.row.name }}
-          <el-popover
-            v-model:visible="scope.row.visible"
-            width="280"
-            placement="top"
-            trigger="click"
-          >
-            <div style="margin-bottom: 10px">
-              <el-input
-                v-model="scope.row.editName"
-                placeholder="请输入"
-                clearable
-                maxlength="68"
-              />
-            </div>
-            <div style="text-align: right">
-              <el-button size="small" @click="scope.row.visible = false">取消</el-button>
-              <el-button type="primary" size="small" @click="confirmEditName(scope.row)"
-                >确定</el-button
-              >
-            </div>
-            <template #reference>
-              <el-icon class="cursor-pointer" @click="editCertName(scope.row)">
-                <EditPen />
-              </el-icon>
-            </template>
-          </el-popover>
+          <div class="cell-wrapper">
+            {{ scope.row.name }}
+            <el-popover
+              v-model:visible="scope.row.visible"
+              width="280"
+              placement="top"
+              trigger="click"
+            >
+              <div style="margin-bottom: 10px">
+                <el-input
+                  v-model="scope.row.editName"
+                  placeholder="请输入"
+                  clearable
+                  maxlength="68"
+                />
+              </div>
+              <div style="text-align: right">
+                <el-button size="small" @click="scope.row.visible = false">取消</el-button>
+                <el-button type="primary" size="small" @click="confirmEditName(scope.row)"
+                  >确定</el-button
+                >
+              </div>
+              <template #reference>
+                <el-icon class="edit-icon" @click="editCertName(scope.row)">
+                  <EditPen />
+                </el-icon>
+              </template>
+            </el-popover>
+          </div>
         </template>
       </el-table-column>
       <el-table-column prop="subjectNames" label="绑定域名">
         <template #default="scope">
-          <el-tooltip
-            class="box-item"
-            placement="top"
-            effect="light"
-            :content="scope.row.subjectNames"
-          >
-            <el-tag type="info" class="bottom-10">{{ scope.row.subjectNames }}</el-tag>
-          </el-tooltip>
-          <el-tag type="info">{{ scope.row.ip }}</el-tag>
+          <div v-for="item in scope.row.subjectNames" :key="item">
+            <el-tooltip class="box-item" placement="top" effect="light" :content="item">
+              <el-tag type="info" class="bottom-10">{{ item }}</el-tag>
+            </el-tooltip>
+          </div>
         </template>
       </el-table-column>
       <el-table-column prop="tags" label="标签">
         <template #header>
           <div class="table-filter-container">
             <span>标签</span>
-            <el-popover placement="bottom-end" :width="300" trigger="click">
-              <template #default>
+            <TableFilterPopover
+              :isFilter="queryParams.tags.length > 0"
+              @search="tableSearch"
+              @reset="onReset('tags', [])"
+            >
+              <template #content>
                 <TagInput v-model="queryParams.tags" :max="20" />
-                <div class="radio-group-bottom">
-                  <el-button size="small">重置</el-button>
-                  <el-button size="small" type="primary">确认</el-button></div
-                >
               </template>
-              <template #reference>
-                <el-icon class="cursor-pointer"><Filter /></el-icon>
-              </template>
-            </el-popover>
+            </TableFilterPopover>
           </div>
         </template>
         <template #default="scope">
-          <el-icon class="mr-1"><PriceTag /></el-icon>{{ scope.row.tags.length }}
+          <el-icon class="mr-1"><PriceTag /></el-icon>
+          <el-tooltip
+            v-if="scope.row.tags.length === 0"
+            class="box-item"
+            placement="top"
+            effect="light"
+            content="暂无标签"
+          >
+            {{ scope.row.tags.length }}
+          </el-tooltip>
+          <span v-else>{{ scope.row.tags.length }}</span>
           <el-tooltip class="box-item" placement="top" effect="light" content="编辑">
-            <el-icon class="cursor-pointer" @click="handleEditTags(scope.row)">
+            <el-icon class="edit-icon" @click="handleEditTags(scope.row)">
               <EditPen />
             </el-icon>
           </el-tooltip>
@@ -101,27 +106,29 @@
         <template #header>
           <div class="table-filter-container">
             <span>状态</span>
-            <el-popover placement="top-start" :width="180" trigger="click">
-              <template #default>
+            <TableFilterPopover
+              placement="top-start"
+              :width="180"
+              @search="tableSearch"
+              :isFilter="!!queryParams.status"
+              @reset="onReset('status', '')"
+            >
+              <template #content>
                 <el-radio-group v-model="queryParams.status">
-                  <el-radio :value="item.value" v-for="item in statusOptions" :key="item.value"
-                    >{{ item.label }}
+                  <el-radio :value="item.value" v-for="item in statusOptions" :key="item.value">
+                    {{ item.label }}
                   </el-radio>
                 </el-radio-group>
-                <div class="radio-group-bottom">
-                  <el-button size="small">重置</el-button>
-                  <el-button size="small" type="primary">确认</el-button></div
-                >
               </template>
-              <template #reference>
-                <el-icon class="cursor-pointer"><Filter /></el-icon>
-              </template>
-            </el-popover>
+            </TableFilterPopover>
           </div>
         </template>
+        <template #default="scope">
+          {{ statusMap[scope.row.status] || '-' }}
+        </template>
       </el-table-column>
-      <el-table-column prop="time" label="有效期限" />
-      <el-table-column prop="cal" label="密钥算法" />
+      <el-table-column prop="notAfter" label="有效期限" />
+      <el-table-column prop="algorithm" label="密钥算法" />
       <el-table-column label="操作">
         <template #default="scope">
           <span @click="handleDelete(scope.row)" class="button-text">删除</span>
@@ -139,18 +146,17 @@
 </template>
 <script setup lang="tsx">
 import { ContentWrap } from '@/components/ContentWrap'
-import { ref } from 'vue'
-import status1 from '@/assets/imgs/status1.svg'
-import status2 from '@/assets/imgs/status2.svg'
-import status3 from '@/assets/imgs/status3.svg'
-import status4 from '@/assets/imgs/status4.svg'
+import { onMounted, ref } from 'vue'
 import UploadCert from './components/UploadCert/index.vue'
 import TagInput from './components/TagInput/index.vue'
 import EditTags from './components/EditTags/index.vue'
 import DeleteDialog from './components/DeleteDialog/index.vue'
 import { TableToolbar } from '@/components/TableToolbar'
+import { TableFilterPopover } from '@/components/TableFilterPopover'
+import { apiGetCertsList } from '@/api/certificate'
+import { CertsList, CertsParams } from '@/api/certificate/type'
+import { statusMap, statusOptions, certOptions } from './constants'
 
-// 添加控制上传证书弹窗显示的响应式变量
 const uploadCertificateVisible = ref(false)
 const editTagsVisible = ref(false)
 const deleteDialogVisible = ref(false)
@@ -167,88 +173,65 @@ const handleEditTags = (row: any) => {
 const handleDelete = (row: any) => {
   deleteDialogVisible.value = true
 }
-const certOptions = [
-  {
-    id: 1,
-    title: '全部证书',
-    number: 1,
-    img: status1
-  },
-  {
-    id: 2,
-    title: '已签发',
-    number: 0,
-    img: status2
-  },
-  {
-    id: 3,
-    title: '即将到期（30天内）',
-    number: 0,
-    img: status3
-  },
-  {
-    id: 4,
-    title: '自定义',
-    number: 0,
-    img: status4
-  }
-]
+
 const currentLevel = ref(1)
 const tagList = ref([])
 const rowTableList = ref<any[]>([])
-interface User {
-  id: number
-  name: string
-  subjectNames: string
-  ip: string
-  tags: Array<string>
-  status: string
-  notAfter: string
-  time: string
-  calCountry: string
-  algorithm: string
+
+const tableData = ref<CertsList[]>([
+  {
+    id: '1',
+    name: '上传证书ceshi',
+    algorithm: 'RSA 2048',
+    subjectNames: ['0bhdfcgc-vm9OxK9cfh.novalocal', '222.73.154.180'],
+    issuer: 'string',
+    serial: 'string',
+    notBefore: '2025-09-28T15:44:03.390Z',
+    notAfter: '2025-09-28T15:44:03.390Z',
+    sha256Fingerprint: 'string',
+    tags: ['123', '1234'],
+    certificatePem: 'string',
+    privateKeyPem: 'string',
+    createdAt: '2025-09-28T15:44:03.390Z',
+    updatedAt: '2025-09-28T15:44:03.390Z',
+    status: 'CERT_STATUS_ISSUE'
+  },
+  {
+    id: '2',
+    name: '上传证书',
+    algorithm: 'RSA 2048',
+    subjectNames: ['0bhdfcgc-vm9OxK9cfh.novalocal', '222.73.154.180'],
+    issuer: 'string',
+    serial: 'string',
+    notBefore: '2025-09-28T15:44:03.390Z',
+    notAfter: '2025-09-28T15:44:03.390Z',
+    sha256Fingerprint: 'string',
+    tags: [],
+    certificatePem: 'string',
+    privateKeyPem: 'string',
+    createdAt: '2025-09-28T15:44:03.390Z',
+    updatedAt: '2025-09-28T15:44:03.390Z',
+    status: 'CERT_STATUS_ISSUE'
+  }
+])
+const queryParams = ref<CertsParams>({
+  status: '',
+  tags: [],
+  nameKeyword: '',
+  subjectKeyword: '',
+  page: 1,
+  pageSize: 10
+})
+
+const getList = async () => {
+  const { data, code } = await apiGetCertsList(queryParams.value)
+  if (code === 200) {
+    tableData.value = data.list
+  }
 }
-const tableData: User[] = [
-  {
-    id: 1,
-    name: '上传证书ceshi',
-    subjectNames: '0bhdfcgc-vm9OxK9cfh.novalocal',
-    ip: '222.73.154.180',
-    tags: ['1', '2', '5'],
-    status: '已签发',
-    notAfter: '2026-08-12 21:16:21',
-    time: '1年',
-    calCountry: '国际',
-    algorithm: 'RSA 2048'
-  },
-  {
-    id: 1,
-    name: '上传证书ceshi',
-    subjectNames: '0bhdfcgc-vm9OxK9cfh.novalocal',
-    ip: '222.73.154.180',
-    tags: ['1'],
-    status: '已签发',
-    notAfter: '2026-08-12 21:16:21',
-    time: '1年',
-    calCountry: '国际',
-    algorithm: 'RSA 2048'
-  }
-]
-const statusOptions = [
-  {
-    label: '即将到期（30天内）',
-    value: '1'
-  },
-  {
-    label: '已到期',
-    value: '2'
-  },
-  {
-    label: '已签发',
-    value: '3'
-  }
-]
-const queryParams = ref({ status: '', tags: [] })
+onMounted(() => {
+  // getList()
+})
 // 修改防护等级弹窗
 const handleClickLevel = (id) => {
   if (currentLevel.value === id) return
@@ -261,11 +244,24 @@ const confirmEditName = (row) => {
   if (row.editName) row.name = row.editName
   row.visible = false
 }
-const onSearch = () => {
+const onSearch = (params) => {
+  queryParams.value = { ...queryParams.value, ...params }
+  console.log(queryParams.value, params)
+  getList()
+}
+const tableSearch = () => {
   console.log(queryParams.value)
+  getList()
+}
+const onReset = (label, value) => {
+  console.log(label)
+  queryParams.value[label] = value
+  tableSearch()
+  getList()
 }
 const onRefresh = () => {
   console.log(queryParams.value)
+  getList()
 }
 </script>
 <style lang="less" scoped>
@@ -318,8 +314,9 @@ const onRefresh = () => {
     border: 1px solid rgb(229, 232, 239);
     border-radius: 8px 8px 0px 0px;
     img {
-      width: 9px;
+      width: 12px;
       margin-right: 4px;
+      vertical-align: middle;
     }
     span {
       color: rgb(66, 70, 78);
@@ -337,5 +334,18 @@ const onRefresh = () => {
     background: rgb(255, 255, 255);
     border-bottom: none;
   }
+}
+
+.edit-icon {
+  display: none;
+  cursor: pointer;
+  margin-left: 5px;
+}
+.el-table__cell .el-icon {
+  vertical-align: middle;
+  margin-top: -4px;
+}
+.el-table__cell:hover .edit-icon {
+  display: inline-block; /* 鼠标浮动时显示 */
 }
 </style>

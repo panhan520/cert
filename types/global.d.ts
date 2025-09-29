@@ -49,6 +49,21 @@ declare global {
     code: number
     data: T extends any ? T : T & any
   }
+  // 添加一个新的接口用于分页数据
+  declare interface IPagination {
+    page: number
+    pageSize: number
+    total: string
+  }
+
+  // 添加分页响应的专用接口
+  declare interface IPaginationResponse<T = any> {
+    code: number
+    data: {
+      list: T[]
+      pagination: IPagination
+    }
+  }
 
   declare interface ThemeTypes {
     elColorPrimary?: string

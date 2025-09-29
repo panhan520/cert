@@ -64,24 +64,38 @@ const columns: TableColumn[] = [
     label: '绑定域名',
     slots: {
       default: ({ row }) => {
-        return h('div', [
-          // 第一行：tooltip + tag
-          h('div', { style: { marginBottom: '4px' } }, [
+        const names: string[] = Array.isArray(row.subjectNames) ? row.subjectNames : []
+
+        return h(
+          'div',
+          { class: 'subject-list' },
+          names.map((item, idx) =>
+            // 外层包一个块级 div，并且给 key，防止 Vue 复用组件实例
             h(
-              ElTooltip,
+              'div',
               {
-                content: row.subjectNames,
-                placement: 'top',
-                effect: 'light'
+                key: `${item}-${idx}`,
+                style: {
+                  display: 'block', // 每个 item 换行
+                  marginBottom: '8px' // 间距（按需调整）
+                }
               },
-              {
-                default: () => h(ElTag, { type: 'info' }, () => row.subjectNames)
-              }
+              [
+                h(
+                  ElTooltip,
+                  {
+                    content: item,
+                    placement: 'top',
+                    effect: 'light'
+                  },
+                  {
+                    default: () => h(ElTag, { type: 'info', class: 'bottom-10' }, () => item)
+                  }
+                )
+              ]
             )
-          ]),
-          // 第二行：另一个 tag
-          h('div', [h(ElTag, { type: 'info' }, () => row.ip)])
-        ])
+          )
+        )
       }
     }
   },

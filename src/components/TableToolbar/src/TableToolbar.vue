@@ -11,9 +11,10 @@
     <div class="toolbar-right">
       <el-select
         v-if="searchOptions && searchOptions.length > 0"
-        v-model="selectedField"
+        v-model="searchParams.subjectKeyword"
         placeholder="请选择"
         style="width: 120px"
+        @change="handleInput"
       >
         <el-option
           v-for="option in searchOptions"
@@ -24,7 +25,7 @@
       </el-select>
 
       <el-input
-        v-model="keyword"
+        v-model="searchParams.nameKeyword"
         placeholder="请输入关键字"
         @input="handleInput"
         @keyup.enter="handleSearch"
@@ -54,7 +55,10 @@ interface SearchOption {
   label: string
   value: string
 }
-
+interface SearchParams {
+  nameKeyword: string
+  subjectKeyword?: string
+}
 const props = defineProps<{
   buttons: ButtonItem[]
   searchOptions?: SearchOption[]
@@ -62,34 +66,35 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'search', keyword: string, field?: string): void
-  (e: 'refresh'): void
+  (e: 'search', params: SearchParams): void
+  (e: 'refresh', params: SearchParams): void
 }>()
-
-const keyword = ref(props.searchValue || '')
-const selectedField = ref(props.searchOptions?.[0]?.value || '')
+const searchParams = ref({
+  nameKeyword: props.searchValue || '',
+  subjectKeyword: props.searchOptions?.[0]?.value || ''
+})
 
 /** 防抖搜索函数 */
 const debounceSearch = debounce(() => {
-  emit('search', keyword.value, selectedField.value)
+  emit('search', { ...searchParams.value })
 }, 300)
 // 输入实时触发搜索
 const handleInput = () => debounceSearch()
 // 回车触发搜索
 const handleSearch = () => {
-  emit('search', keyword.value, selectedField.value)
+  emit('search', { ...searchParams.value })
 }
 
 // 刷新
 const handleRefresh = () => {
-  emit('refresh')
+  emit('refresh', { ...searchParams.value })
 }
 
 // 外部更新 keyword 时同步
 watch(
   () => props.searchValue,
   (val) => {
-    keyword.value = val || ''
+    searchParams.value.nameKeyword = val || ''
   }
 )
 </script>
