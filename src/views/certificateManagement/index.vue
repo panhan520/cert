@@ -230,7 +230,7 @@ const getList = async () => {
   }
 }
 onMounted(() => {
-  // getList()
+  getList()
 })
 // 修改防护等级弹窗
 const handleClickLevel = (id) => {

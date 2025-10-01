@@ -6,5 +6,5 @@ export const apiGetCertsList = (data: CertsParams): Promise<IPaginationResponse<
 }
 
 export const apiCreateCert = (data: CreateCertificate): Promise<IPaginationResponse<CertsList>> => {
-  return request.post({ url: '/apis/v1/certs', params: data })
+  return request.post({ url: '/apis/v1/certs', data })
 }
