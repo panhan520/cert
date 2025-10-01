@@ -155,10 +155,9 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       port: 4001,
       proxy: {
         // 选项写法
-        '/api': {
-          target: 'http://127.0.0.1:8000',
+        '/apis': {
+          target: 'http://172.31.36.140:11001',
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api/, '')
         }
       },
       hmr: {
