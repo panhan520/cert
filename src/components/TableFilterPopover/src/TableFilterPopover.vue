@@ -33,15 +33,20 @@ withDefaults(defineProps<Props>(), {
 })
 
 const emit = defineEmits<{
-  (e: 'search'): void
+  (e: 'search', callback?: (shouldClose?: boolean) => void): void
   (e: 'reset'): void
 }>()
 
 const visible = ref(false)
 
-const search = () => {
-  emit('search')
-  visible.value = false
+const search = async () => {
+  emit('search', (shouldClose: boolean = true) => {
+    if (shouldClose) {
+      visible.value = false
+    }
+  })
+  // emit('search')
+  // visible.value = false
 }
 
 const reset = () => {

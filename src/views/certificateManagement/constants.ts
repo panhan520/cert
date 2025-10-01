@@ -4,14 +4,16 @@ import status3 from '@/assets/imgs/status3.svg'
 import status4 from '@/assets/imgs/status4.svg'
 
 export const statusMap: Record<string, string> = {
-  CERT_STATUS_EXPIRES_SOON: '即将到期（30天内）',
-  CERT_STATUS_EXPIRED: '已到期',
-  CERT_STATUS_ISSUE: '已签发'
+  CERT_STATUS_EXPIRES_SOON: '即将过期',
+  CERT_STATUS_EXPIRED: '已过期',
+  CERT_STATUS_ISSUE: '已签发',
+  CERT_STATUS_ABNORMAL: '异常',
+  CERT_STATUS_UNUSED: '未使用'
 }
 
 export const statusOptions = [
   {
-    label: '即将到期（30天内）',
+    label: '即将过期',
     value: 'CERT_STATUS_EXPIRES_SOON'
   },
   {
@@ -21,6 +23,14 @@ export const statusOptions = [
   {
     label: '已签发',
     value: 'CERT_STATUS_ISSUE'
+  },
+  {
+    label: '异常',
+    value: 'CERT_STATUS_ABNORMAL'
+  },
+  {
+    label: '未使用',
+    value: 'CERT_STATUS_UNUSED'
   }
 ]
 

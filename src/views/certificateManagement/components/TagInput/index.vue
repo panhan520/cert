@@ -34,7 +34,7 @@
 
 <script setup lang="ts">
 import { Delete, CirclePlus } from '@element-plus/icons-vue'
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 const props = defineProps<{
   modelValue: string[]
@@ -43,15 +43,33 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'update:modelValue', val: string[]): void
+  (e: 'valid-change', isValid: boolean): void
 }>()
 
 const max = props.max ?? 50
 const formRef = ref()
+const isValid = ref(true)
 
 const form = reactive({
   tags: [''] // 初始一个空标签
 })
+// 校验整个表单并通知父组件
+const validateForm = () => {
+  if (!formRef.value) return
 
+  formRef.value.validate((valid: boolean) => {
+    isValid.value = valid
+    emit('valid-change', valid) // 通知父组件校验状态
+  })
+}
+watch(
+  () => props.modelValue,
+  (newVal) => {
+    form.tags = [...newVal]
+    validateForm() // 值变化时重新校验
+  },
+  { immediate: true }
+)
 const rules = {
   tags: [
     {
@@ -66,6 +84,27 @@ const rules = {
     }
   ]
 }
+
+// 提供给外部使用的校验方法
+const validate = (): Promise<boolean> => {
+  return new Promise((resolve) => {
+    if (!formRef.value) {
+      resolve(true)
+      return
+    }
+
+    formRef.value.validate((valid: boolean) => {
+      isValid.value = valid
+      emit('valid-change', valid)
+      resolve(valid)
+    })
+  })
+}
+// 暴露方法给父组件调用
+defineExpose({
+  validate,
+  isValid: () => isValid.value
+})
 const onSubmit = () => {
   ;(formRef.value as any).validate((valid: boolean) => {
     if (valid) {
@@ -85,7 +124,10 @@ const removeTag = (index: number) => {
   newTags.splice(index, 1)
   emit('update:modelValue', newTags)
 }
-
+// 初始化时进行一次校验
+onMounted(() => {
+  validateForm()
+})
 const updateTag = (val: string, index: number) => {
   const newTags = [...props.modelValue]
   newTags[index] = val

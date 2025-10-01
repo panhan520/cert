@@ -18,8 +18,8 @@
     <TableToolbar
       :buttons="[{ key: 'buy', label: '上传证书', onClick: handleUploadCertificate }]"
       :searchOptions="[
-        { label: '备注名称', value: 'remarkName' },
-        { label: '证书ID', value: 'certId' }
+        { label: '备注名称', value: 'nameKeyword' },
+        { label: '域名', value: 'subjectKeyword' }
       ]"
       @search="onSearch"
       @refresh="onRefresh"
@@ -74,11 +74,16 @@
             <span>标签</span>
             <TableFilterPopover
               :isFilter="queryParams.tags.length > 0"
-              @search="tableSearch"
+              @search="handleTagSearch"
               @reset="onReset('tags', [])"
             >
               <template #content>
-                <TagInput v-model="queryParams.tags" :max="20" />
+                <TagInput
+                  ref="tagInputRef"
+                  v-model="queryParams.tags"
+                  :max="20"
+                  @valid-change="onValidChange"
+                />
               </template>
             </TableFilterPopover>
           </div>
@@ -164,12 +169,32 @@ import { apiGetCertsList } from '@/api/certificate'
 import { CertsList, CertsParams } from '@/api/certificate/type'
 import { statusMap, statusOptions, certOptions } from './constants'
 import { Pagination } from '@/components/Pagination'
+import { ElMessage } from 'element-plus'
 const uploadCertificateVisible = ref(false)
 const editTagsVisible = ref(false)
 const deleteDialogVisible = ref(false)
 // 添加总记录数变量（模拟从 API 获取）
-const totalRecords = ref(400)
+const totalRecords = ref('0')
+const tagValid = ref(true)
+const tagInputRef = ref<InstanceType<typeof TagInput> | null>(null)
+const onValidChange = (isValid: boolean) => {
+  tagValid.value = isValid
+}
+const handleTagSearch = async (callback?: (shouldClose?: boolean) => void) => {
+  if (tagInputRef.value) {
+    const valid = await tagInputRef.value.validate()
+    const shouldClose = false // 根据条件判断是否关闭
+    if (callback) {
+      callback(shouldClose)
+    }
+    if (!valid) {
+      ElMessage.warning('标签输入不合法，请检查后重试')
+      return
+    }
+  }
 
+  tableSearch()
+}
 // 更新分页参数的方法
 const handlePageChange = (currentPage: number, pageSize: number) => {
   queryParams.value.page = currentPage
@@ -242,6 +267,7 @@ const getList = async () => {
   const { data, code } = await apiGetCertsList(queryParams.value)
   if (code === 200) {
     tableData.value = data.list
+    totalRecords.value = data.pagination.total
   }
 }
 onMounted(() => {

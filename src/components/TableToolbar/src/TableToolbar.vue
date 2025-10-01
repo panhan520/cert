@@ -11,10 +11,10 @@
     <div class="toolbar-right">
       <el-select
         v-if="searchOptions && searchOptions.length > 0"
-        v-model="searchParams.subjectKeyword"
+        v-model="selectValue"
         placeholder="请选择"
         style="width: 120px"
-        @change="handleInput"
+        @change="changeSelect"
       >
         <el-option
           v-for="option in searchOptions"
@@ -25,12 +25,22 @@
       </el-select>
 
       <el-input
-        v-model="searchParams.nameKeyword"
+        v-model="searchParams[selectValue]"
         placeholder="请输入关键字"
         @input="handleInput"
+        clearable
         @keyup.enter="handleSearch"
         style="width: 200px; margin-left: 8px"
       />
+      <!-- <el-input
+        v-if="selectValue === 'subjectKeyword'"
+        v-model="searchParams[searchParams.subjectKeyword]"
+        placeholder="请输入关键字"
+        @input="handleInput"
+        clearable
+        @keyup.enter="handleSearch"
+        style="width: 200px; margin-left: 8px"
+      /> -->
       <el-tooltip content="刷新" placement="top" effect="light">
         <el-button @click="handleRefresh" class="refresh-btn"
           ><el-icon :size="16"><RefreshRight /></el-icon
@@ -56,8 +66,8 @@ interface SearchOption {
   value: string
 }
 interface SearchParams {
-  nameKeyword: string
-  subjectKeyword?: string
+  nameKeyword: undefined | string | null
+  subjectKeyword?: undefined | string | null
 }
 const props = defineProps<{
   buttons: ButtonItem[]
@@ -69,9 +79,10 @@ const emit = defineEmits<{
   (e: 'search', params: SearchParams): void
   (e: 'refresh', params: SearchParams): void
 }>()
-const searchParams = ref({
-  nameKeyword: props.searchValue || '',
-  subjectKeyword: props.searchOptions?.[0]?.value || ''
+const selectValue = ref(props.searchOptions?.[0]?.value || '')
+const searchParams = ref<SearchParams>({
+  nameKeyword: null,
+  subjectKeyword: null
 })
 
 /** 防抖搜索函数 */
@@ -84,7 +95,13 @@ const handleInput = () => debounceSearch()
 const handleSearch = () => {
   emit('search', { ...searchParams.value })
 }
-
+const changeSelect = () => {
+  searchParams.value = {
+    nameKeyword: null,
+    subjectKeyword: null
+  }
+  handleInput()
+}
 // 刷新
 const handleRefresh = () => {
   emit('refresh', { ...searchParams.value })
