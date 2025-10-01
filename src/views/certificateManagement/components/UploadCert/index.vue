@@ -150,7 +150,7 @@
             <p v-else> 开启后，允许上传相同内容的证书 </p>
           </div>
         </el-form-item>
-        <el-form-item label="开启证书完整性校验" prop="integrityCheckEnabled">
+        <el-form-item label="开启证书完整性校验" prop="disableIntegrityCheck">
           <template #label>
             <span
               >开启证书完整性校验
@@ -164,11 +164,11 @@
             </span>
           </template>
           <div class="form-item-switch">
-            <el-switch v-model="ruleForm.integrityCheckEnabled" />
+            <el-switch v-model="ruleForm.disableIntegrityCheck" />
           </div>
 
           <div class="form-item-desc">
-            <p v-if="ruleForm.integrityCheckEnabled">关闭后，不进行证书完整性校验</p>
+            <p v-if="ruleForm.disableIntegrityCheck">关闭后，不进行证书完整性校验</p>
             <p v-else>开启后，默认进行证书完整性校验</p>
           </div>
         </el-form-item>
@@ -187,6 +187,7 @@
 import { ref, reactive, computed, toRaw } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import TagInput from '../TagInput/index.vue'
+import { apiCreateCert } from '@/api/certificate'
 const props = defineProps({
   visible: {
     type: Boolean,
@@ -205,10 +206,9 @@ const ruleForm = reactive({
   mode: 'file', // 上传方式
   certificatePem: '', // 证书文件
   privateKeyPem: '', // 私钥文件
-  certFile: null, // 证书文件
   name: '上传证书',
   allowDuplicate: false,
-  integrityCheckEnabled: true,
+  disableIntegrityCheck: true,
   tags: []
 })
 const rules = reactive<FormRules>({
@@ -270,13 +270,25 @@ const resetForm = (formEl: FormInstance | undefined) => {
 }
 // 表单提交
 const submitForm = async (formEl: FormInstance | undefined) => {
-  const payload = toRaw(ruleForm)
-  console.log(payload)
   if (!formEl) return
-  await formEl.validate((valid, fields) => {
+  await formEl.validate(async (valid, fields) => {
     if (valid) {
-      console.log('submit!')
-      visible.value = false
+      console.log('submit!', valid)
+      const rawForm = toRaw(ruleForm)
+      const params = {
+        certificatePem: rawForm.certificatePem,
+        privateKeyPem: rawForm.privateKeyPem,
+        name: rawForm.name,
+        allowDuplicate: rawForm.allowDuplicate,
+        disableIntegrityCheck: rawForm.disableIntegrityCheck,
+        tags: rawForm.tags
+      }
+      console.log(params)
+      const { data, code } = await apiCreateCert(params)
+      if (code === 200) {
+        console.log(data, 'data')
+        handleCancel(ruleFormRef.value)
+      }
     } else {
       console.log('error submit!', fields)
     }

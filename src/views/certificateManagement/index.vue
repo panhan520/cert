@@ -290,6 +290,7 @@ const onRefresh = () => {
   line-height: 26px;
   color: #0c0d0e;
   margin-bottom: 20px;
+  text-align: left;
 }
 .bottom-10 {
   margin-bottom: 10px;

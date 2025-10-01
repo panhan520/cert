@@ -24,3 +24,12 @@ export interface CertsList {
   createdAt: string
   updatedAt: string
 }
+
+export interface CreateCertificate {
+  name: string
+  certificatePem: string
+  privateKeyPem: string
+  tags: string[]
+  allowDuplicate: boolean
+  disableIntegrityCheck: boolean
+}
