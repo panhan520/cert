@@ -3,8 +3,8 @@ export interface CertsParams {
   nameKeyword?: string
   tags: Array<string>
   status: string
-  page?: number
-  pageSize?: number
+  page: number
+  pageSize: number
 }
 
 export interface CertsList {

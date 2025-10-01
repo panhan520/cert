@@ -135,6 +135,13 @@
         </template>
       </el-table-column>
     </el-table>
+    <Pagination
+      v-model="queryParams.page"
+      :page-size="queryParams.pageSize"
+      :total="totalRecords"
+      :page-sizes="[10, 20, 50, 100]"
+      @change="handlePageChange"
+    />
     <UploadCert v-model:visible="uploadCertificateVisible" />
     <EditTags
       v-model:visible="editTagsVisible"
@@ -156,11 +163,19 @@ import { TableFilterPopover } from '@/components/TableFilterPopover'
 import { apiGetCertsList } from '@/api/certificate'
 import { CertsList, CertsParams } from '@/api/certificate/type'
 import { statusMap, statusOptions, certOptions } from './constants'
-
+import { Pagination } from '@/components/Pagination'
 const uploadCertificateVisible = ref(false)
 const editTagsVisible = ref(false)
 const deleteDialogVisible = ref(false)
+// 添加总记录数变量（模拟从 API 获取）
+const totalRecords = ref(400)
 
+// 更新分页参数的方法
+const handlePageChange = (currentPage: number, pageSize: number) => {
+  queryParams.value.page = currentPage
+  queryParams.value.pageSize = pageSize
+  getList() // 刷新列表数据
+}
 // 修改按钮点击处理函数
 const handleUploadCertificate = () => {
   uploadCertificateVisible.value = true
