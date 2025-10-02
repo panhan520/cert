@@ -23,15 +23,15 @@ export const statusOptions = [
   {
     label: '已签发',
     value: 'CERT_STATUS_ISSUE'
-  },
-  {
-    label: '异常',
-    value: 'CERT_STATUS_ABNORMAL'
-  },
-  {
-    label: '未使用',
-    value: 'CERT_STATUS_UNUSED'
   }
+  // {
+  //   label: '异常',
+  //   value: 'CERT_STATUS_ABNORMAL'
+  // },
+  // {
+  //   label: '未使用',
+  //   value: 'CERT_STATUS_UNUSED'
+  // }
 ]
 
 export const certOptions = [

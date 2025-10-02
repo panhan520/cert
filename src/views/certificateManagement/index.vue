@@ -132,8 +132,18 @@
           {{ statusMap[scope.row.status] || '-' }}
         </template>
       </el-table-column>
-      <el-table-column prop="notAfter" label="有效期限" />
-      <el-table-column prop="algorithm" label="密钥算法" />
+      <el-table-column prop="notAfter" label="有效期限">
+        <template #default="scope">
+          <div>{{ scope.row.certValidityFriendly }}</div>
+          {{ scope.row.notAfter }}
+        </template>
+      </el-table-column>
+      <el-table-column prop="algorithmFriendly" label="密钥算法">
+        <template #default="scope">
+          <el-tag type="info" class="mr-2">国际</el-tag>
+          {{ scope.row.algorithmFriendly }}
+        </template>
+      </el-table-column>
       <el-table-column label="操作">
         <template #default="scope">
           <span @click="handleDelete(scope.row)" class="button-text">删除</span>
@@ -183,7 +193,8 @@ const onValidChange = (isValid: boolean) => {
 const handleTagSearch = async (callback?: (shouldClose?: boolean) => void) => {
   if (tagInputRef.value) {
     const valid = await tagInputRef.value.validate()
-    const shouldClose = false // 根据条件判断是否关闭
+    const shouldClose = true
+    // 根据条件判断是否关闭
     if (callback) {
       callback(shouldClose)
     }
@@ -218,42 +229,7 @@ const currentLevel = ref(1)
 const tagList = ref([])
 const rowTableList = ref<any[]>([])
 
-const tableData = ref<CertsList[]>([
-  {
-    id: '1',
-    name: '上传证书ceshi',
-    algorithm: 'RSA 2048',
-    subjectNames: ['0bhdfcgc-vm9OxK9cfh.novalocal', '222.73.154.180'],
-    issuer: 'string',
-    serial: 'string',
-    notBefore: '2025-09-28T15:44:03.390Z',
-    notAfter: '2025-09-28T15:44:03.390Z',
-    sha256Fingerprint: 'string',
-    tags: ['123', '1234'],
-    certificatePem: 'string',
-    privateKeyPem: 'string',
-    createdAt: '2025-09-28T15:44:03.390Z',
-    updatedAt: '2025-09-28T15:44:03.390Z',
-    status: 'CERT_STATUS_ISSUE'
-  },
-  {
-    id: '2',
-    name: '上传证书',
-    algorithm: 'RSA 2048',
-    subjectNames: ['0bhdfcgc-vm9OxK9cfh.novalocal', '222.73.154.180'],
-    issuer: 'string',
-    serial: 'string',
-    notBefore: '2025-09-28T15:44:03.390Z',
-    notAfter: '2025-09-28T15:44:03.390Z',
-    sha256Fingerprint: 'string',
-    tags: [],
-    certificatePem: 'string',
-    privateKeyPem: 'string',
-    createdAt: '2025-09-28T15:44:03.390Z',
-    updatedAt: '2025-09-28T15:44:03.390Z',
-    status: 'CERT_STATUS_ISSUE'
-  }
-])
+const tableData = ref<CertsList[]>([])
 const queryParams = ref<CertsParams>({
   status: '',
   tags: [],
