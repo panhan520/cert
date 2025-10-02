@@ -34,7 +34,7 @@ const props = defineProps({
     default: false
   }
 })
-const emit = defineEmits(['update:visible', 'update:tags'])
+const emit = defineEmits(['update:visible', 'confirmDelete'])
 const visible = computed({
   get: () => props.visible,
   set: (val) => emit('update:visible', val)
@@ -64,13 +64,11 @@ const handleCancel = (formEl: FormInstance | undefined) => {
   formEl.resetFields()
 }
 const handleConfirm = async (formEl: FormInstance | undefined) => {
-  const payload = toRaw(ruleForm)
-  console.log(payload)
   if (!formEl) return
   await formEl.validate((valid, fields) => {
     if (valid) {
-      console.log('submit!')
       visible.value = false
+      emit('confirmDelete')
     } else {
       console.log('error submit!', fields)
     }

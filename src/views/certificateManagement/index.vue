@@ -224,13 +224,13 @@ const getList = async () => {
 const getCertTotalData = async () => {
   const { data, code } = await apiGetCertTotal()
   if (code === 200) {
-    const TotalSum = data.reduce((acc, cur) => acc + cur.total, 0)
+    const TotalSum = data.total.reduce((acc, cur) => acc + cur.total, 0)
     certOptions.value = [
       {
         status: 'CERT_STATUS_ALL',
         total: TotalSum
       },
-      ...data
+      ...data.total
     ]
   }
 }
@@ -294,9 +294,9 @@ const handleUploadCertificate = () => {
   uploadCertificateVisible.value = true
 }
 // 开启删除证书
-const handleDelete = (row: any) => {
+const handleDelete = (id: any) => {
   deleteDialogVisible.value = true
-  currentCertId.value = row.id
+  currentCertId.value = id
 }
 // 确认删除证书
 const confirmDelete = async () => {
