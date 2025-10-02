@@ -4,15 +4,15 @@
     <ul class="ul-continer">
       <li
         v-for="item in certOptions"
-        :key="item.id"
-        :class="{ active: currentLevel === item.id }"
-        @click="handleClickLevel(item.id)"
+        :key="item.status"
+        :class="{ active: currentStatus === item.status }"
+        @click="handleClickStatus(item.status)"
       >
         <div>
-          <img :src="item.img" alt="" />
-          <span>{{ item.title }}</span>
+          <img :src="statusImgMap[item.status]" alt="" />
+          <span>{{ statusMap[item.status] }}</span>
         </div>
-        <p>{{ item.number }}</p>
+        <p>{{ item.total }}</p>
       </li>
     </ul>
     <TableToolbar
@@ -146,7 +146,7 @@
       </el-table-column>
       <el-table-column label="操作">
         <template #default="scope">
-          <span @click="handleDelete(scope.row)" class="button-text">删除</span>
+          <span @click="handleDelete(scope.row.id)" class="button-text">删除</span>
         </template>
       </el-table-column>
     </el-table>
@@ -162,8 +162,9 @@
       v-model:visible="editTagsVisible"
       v-model:tags="tagList"
       :tableDataList="rowTableList"
+      @confirmEditTags="confirmEditTags"
     />
-    <DeleteDialog v-model:visible="deleteDialogVisible" />
+    <DeleteDialog v-model:visible="deleteDialogVisible" @confirmDelete="confirmDelete" />
   </ContentWrap>
 </template>
 <script setup lang="tsx">
@@ -175,18 +176,94 @@ import EditTags from './components/EditTags/index.vue'
 import DeleteDialog from './components/DeleteDialog/index.vue'
 import { TableToolbar } from '@/components/TableToolbar'
 import { TableFilterPopover } from '@/components/TableFilterPopover'
-import { apiGetCertsList } from '@/api/certificate'
+import { apiGetCertsList, apiDeleteCert, apiGetCertTotal, apiUpdateCert } from '@/api/certificate'
 import { CertsList, CertsParams } from '@/api/certificate/type'
-import { statusMap, statusOptions, certOptions } from './constants'
+import { statusMap, statusOptions, statusImgMap } from './constants'
 import { Pagination } from '@/components/Pagination'
 import { ElMessage } from 'element-plus'
 const uploadCertificateVisible = ref(false)
 const editTagsVisible = ref(false)
 const deleteDialogVisible = ref(false)
+const currentCertId = ref('')
 // 添加总记录数变量（模拟从 API 获取）
 const totalRecords = ref('0')
 const tagValid = ref(true)
 const tagInputRef = ref<InstanceType<typeof TagInput> | null>(null)
+interface CertOption {
+  status: string
+  total: number
+}
+const certOptions = ref<CertOption[]>([])
+
+const currentStatus = ref('CERT_STATUS_ALL')
+const tagList = ref([])
+const rowTableList = ref<any[]>([])
+
+const tableData = ref<CertsList[]>([])
+const queryParams = ref<CertsParams>({
+  status: '',
+  tags: [],
+  nameKeyword: '',
+  subjectKeyword: '',
+  page: 1,
+  pageSize: 10
+})
+onMounted(() => {
+  getList()
+  getCertTotalData()
+})
+// 获取列表
+const getList = async () => {
+  const { data, code } = await apiGetCertsList(queryParams.value)
+  if (code === 200) {
+    tableData.value = data.list
+    totalRecords.value = data.pagination.total
+  }
+}
+// 证书状态统计
+const getCertTotalData = async () => {
+  const { data, code } = await apiGetCertTotal()
+  if (code === 200) {
+    const TotalSum = data.reduce((acc, cur) => acc + cur.total, 0)
+    certOptions.value = [
+      {
+        status: 'CERT_STATUS_ALL',
+        total: TotalSum
+      },
+      ...data
+    ]
+  }
+}
+// 更新证书
+const updateCertData = async (params: any) => {
+  const { code } = await apiUpdateCert(params)
+  if (code === 200) {
+    ElMessage.success('修改成功')
+    getList()
+  }
+}
+// 开启编辑证书名称
+const editCertName = (row) => {
+  row.editName = row.name
+}
+// 确认编辑证书名称
+const confirmEditName = (row) => {
+  if (row.editName) {
+    updateCertData({ certId: row.id, name: row.editName, modifyTags: false })
+    row.visible = false
+  }
+}
+// 开启编辑标签
+const handleEditTags = (row: any) => {
+  tagList.value = row.tags
+  rowTableList.value = [row]
+  editTagsVisible.value = true
+}
+// 确认编辑标签
+const confirmEditTags = () => {
+  updateCertData({ certId: rowTableList.value[0].id, modifyTags: true, tags: tagList.value })
+  editTagsVisible.value = false
+}
 const onValidChange = (isValid: boolean) => {
   tagValid.value = isValid
 }
@@ -216,51 +293,26 @@ const handlePageChange = (currentPage: number, pageSize: number) => {
 const handleUploadCertificate = () => {
   uploadCertificateVisible.value = true
 }
-const handleEditTags = (row: any) => {
-  tagList.value = row.tags
-  rowTableList.value = [row]
-  editTagsVisible.value = true
-}
+// 开启删除证书
 const handleDelete = (row: any) => {
   deleteDialogVisible.value = true
+  currentCertId.value = row.id
 }
-
-const currentLevel = ref(1)
-const tagList = ref([])
-const rowTableList = ref<any[]>([])
-
-const tableData = ref<CertsList[]>([])
-const queryParams = ref<CertsParams>({
-  status: '',
-  tags: [],
-  nameKeyword: '',
-  subjectKeyword: '',
-  page: 1,
-  pageSize: 10
-})
-
-const getList = async () => {
-  const { data, code } = await apiGetCertsList(queryParams.value)
-  if (code === 200) {
-    tableData.value = data.list
-    totalRecords.value = data.pagination.total
-  }
+// 确认删除证书
+const confirmDelete = async () => {
+  await apiDeleteCert({ certId: currentCertId.value }).then(() => {
+    ElMessage.success('删除成功')
+    getList()
+  })
 }
-onMounted(() => {
+// 修改证书过滤状态
+const handleClickStatus = (status) => {
+  if (currentStatus.value === status) return
+  currentStatus.value = status
+  queryParams.value.status = status === 'CERT_STATUS_ALL' ? '' : status
   getList()
-})
-// 修改防护等级弹窗
-const handleClickLevel = (id) => {
-  if (currentLevel.value === id) return
-  currentLevel.value = id
 }
-const editCertName = (row) => {
-  row.editName = row.name
-}
-const confirmEditName = (row) => {
-  if (row.editName) row.name = row.editName
-  row.visible = false
-}
+
 const onSearch = (params) => {
   queryParams.value = { ...queryParams.value, ...params }
   console.log(queryParams.value, params)

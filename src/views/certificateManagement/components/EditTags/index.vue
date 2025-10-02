@@ -49,7 +49,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update:visible', 'update:tags'])
+const emit = defineEmits(['update:visible', 'update:tags', 'confirmEditTags'])
 const visible = computed({
   get: () => props.visible,
   set: (val) => emit('update:visible', val)
@@ -108,6 +108,7 @@ const handleCancel = () => {
   visible.value = false
 }
 const submitForm = () => {
+  emit('confirmEditTags')
   visible.value = false
 }
 </script>

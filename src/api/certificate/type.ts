@@ -33,3 +33,7 @@ export interface CreateCertificate {
   allowDuplicate: boolean
   disableIntegrityCheck: boolean
 }
+
+export interface DeleteCertificate {
+  certId: string
+}
