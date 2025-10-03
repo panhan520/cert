@@ -25,7 +25,7 @@
       @refresh="onRefresh"
     />
 
-    <el-table :data="tableData" row-key="id" border>
+    <el-table :data="tableData" row-key="id" border :loading="loading">
       <el-table-column prop="name" label="证书名称">
         <template #default="scope">
           <div class="cell-wrapper">
@@ -159,6 +159,7 @@
     />
     <UploadCert v-model:visible="uploadCertificateVisible" />
     <EditTags
+      ref="editTagsRef"
       v-model:visible="editTagsVisible"
       v-model:tags="tagList"
       :tableDataList="rowTableList"
@@ -189,6 +190,7 @@ const currentCertId = ref('')
 const totalRecords = ref('0')
 const tagValid = ref(true)
 const tagInputRef = ref<InstanceType<typeof TagInput> | null>(null)
+const editTagsRef = ref<InstanceType<typeof EditTags> | null>(null)
 interface CertOption {
   status: string
   total: number
@@ -208,16 +210,23 @@ const queryParams = ref<CertsParams>({
   page: 1,
   pageSize: 10
 })
+const loading = ref(false)
 onMounted(() => {
   getList()
   getCertTotalData()
 })
 // 获取列表
 const getList = async () => {
-  const { data, code } = await apiGetCertsList(queryParams.value)
-  if (code === 200) {
-    tableData.value = data.list
-    totalRecords.value = data.pagination.total
+  try {
+    loading.value = true
+    const { data, code } = await apiGetCertsList(queryParams.value)
+    loading.value = false
+    if (code === 200) {
+      tableData.value = data.list
+      totalRecords.value = data.pagination.total
+    }
+  } catch {
+    loading.value = false
   }
 }
 // 证书状态统计
@@ -271,13 +280,12 @@ const handleTagSearch = async (callback?: (shouldClose?: boolean) => void) => {
   if (tagInputRef.value) {
     const valid = await tagInputRef.value.validate()
     const shouldClose = true
+    if (!valid) {
+      return
+    }
     // 根据条件判断是否关闭
     if (callback) {
       callback(shouldClose)
-    }
-    if (!valid) {
-      ElMessage.warning('标签输入不合法，请检查后重试')
-      return
     }
   }
 

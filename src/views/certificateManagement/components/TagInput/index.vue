@@ -126,10 +126,13 @@ const updateTag = (val: string, index: number) => {
 }
 </script>
 <style lang="less" scoped>
+:deep(.el-form-item--default) {
+  margin-bottom: 0;
+}
 .form-item-tag {
   .item-tag {
     width: 100%;
-    margin-top: 15px;
+    margin-bottom: 15px;
     display: flex;
     align-items: center;
     :deep(.el-input) {
@@ -144,7 +147,6 @@ const updateTag = (val: string, index: number) => {
   align-items: center;
   gap: 5px;
   font-size: 13px;
-  margin-top: 10px;
   > span:nth-child(1) {
     display: flex;
     gap: 5px;

@@ -19,7 +19,7 @@
         <el-icon><QuestionFilled /></el-icon>
       </el-tooltip>
     </div>
-    <TagInput v-model="tags" />
+    <TagInput v-model="tags" ref="tagInputRef" />
     <template #footer>
       <div class="dialog-footer">
         <el-button @click="handleCancel()">取消</el-button>
@@ -29,7 +29,7 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { computed, h } from 'vue'
+import { computed, h, ref } from 'vue'
 import { ElTooltip, ElTag } from 'element-plus'
 
 import { Table, TableColumn } from '@/components/Table'
@@ -48,6 +48,7 @@ const props = defineProps({
     default: () => []
   }
 })
+const tagInputRef = ref<InstanceType<typeof TagInput> | null>(null)
 
 const emit = defineEmits(['update:visible', 'update:tags', 'confirmEditTags'])
 const visible = computed({
@@ -107,7 +108,11 @@ const columns: TableColumn[] = [
 const handleCancel = () => {
   visible.value = false
 }
-const submitForm = () => {
+const submitForm = async () => {
+  const tagsValid = await tagInputRef.value?.validate()
+  if (!tagsValid) {
+    return
+  }
   emit('confirmEditTags')
   visible.value = false
 }
