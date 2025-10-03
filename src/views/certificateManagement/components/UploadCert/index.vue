@@ -61,7 +61,9 @@
             action="#"
             accept=".crt,.pem"
             :auto-upload="false"
+            :file-list="fileList"
             :on-change="handleFileChange"
+            :on-remove="handleFileRemove"
           >
             <el-icon class="el-icon--upload"><upload-filled /></el-icon>
             <div class="el-upload__text">点击或拖拽文件到此处上传</div>
@@ -102,6 +104,8 @@
             accept=".key,.pem"
             :auto-upload="false"
             :on-change="handleFileChangeKey"
+            :file-list="fileListKey"
+            :on-remove="handleFileRemoveKey"
           >
             <el-icon class="el-icon--upload"><upload-filled /></el-icon>
             <div class="el-upload__text">点击或拖拽文件到此处上传</div>
@@ -139,7 +143,7 @@
               </el-tooltip>
             </span>
           </template>
-          <TagInput v-model="ruleForm.tags" />
+          <TagInput v-model="ruleForm.tags" ref="tagInputRef" />
         </el-form-item>
         <el-form-item label="允许上传相同证书" prop="allowDuplicate">
           <div class="form-item-switch">
@@ -177,7 +181,9 @@
     <template #footer>
       <div class="dialog-footer">
         <el-button @click="handleCancel(ruleFormRef)">取消</el-button>
-        <el-button type="primary" @click="submitForm(ruleFormRef)"> 确定 </el-button>
+        <el-button type="primary" @click="submitForm(ruleFormRef)" :loading="loading">
+          确定
+        </el-button>
       </div>
     </template>
   </el-dialog>
@@ -186,8 +192,10 @@
 <script setup lang="ts">
 import { ref, reactive, computed, toRaw } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
+import type { UploadFile } from 'element-plus'
 import TagInput from '../TagInput/index.vue'
 import { apiCreateCert } from '@/api/certificate'
+import { ElMessage } from 'element-plus'
 const props = defineProps({
   visible: {
     type: Boolean,
@@ -200,17 +208,18 @@ const visible = computed({
   set: (val) => emit('update:visible', val)
 })
 const ruleFormRef = ref<FormInstance>()
-const ruleForm = reactive({
-  standards: 'gj', // 国际标准
-  algorithm: 'rsa', // RSA/ECC
-  mode: 'file', // 上传方式
-  certificatePem: '', // 证书文件
-  privateKeyPem: '', // 私钥文件
+const initialForm = {
+  standards: 'gj',
+  algorithm: 'rsa',
+  mode: 'file',
+  certificatePem: '',
+  privateKeyPem: '',
   name: '上传证书',
   allowDuplicate: false,
   disableIntegrityCheck: true,
   tags: []
-})
+}
+const ruleForm = reactive({ ...initialForm })
 const rules = reactive<FormRules>({
   standards: [{ required: true, trigger: 'change' }],
   algorithm: [
@@ -247,21 +256,37 @@ const rules = reactive<FormRules>({
     }
   ]
 })
-const handleFileChange = (uploadFile: any) => {
-  if (!uploadFile.raw) return
+const fileList = ref<UploadFile[]>([])
+const fileListKey = ref<UploadFile[]>([])
+const loading = ref(false)
+const tagInputRef = ref<InstanceType<typeof TagInput>>()
+const handleFileChange = (file: UploadFile, files: UploadFile[]) => {
+  if (!file.raw) return
   const reader = new FileReader()
   reader.onload = (e) => {
     ruleForm.certificatePem = e.target?.result as string
   }
-  reader.readAsText(uploadFile.raw)
+  reader.readAsText(file.raw)
+  fileList.value = files.slice(-1) // 只保留最新的一个文件
+  ruleFormRef.value?.clearValidate('certificatePem')
 }
-const handleFileChangeKey = (uploadFile: any) => {
-  if (!uploadFile.raw) return
+const handleFileRemove = () => {
+  fileList.value = []
+  ruleForm.certificatePem = ''
+}
+const handleFileChangeKey = (file: UploadFile, files: UploadFile[]) => {
+  if (!file.raw) return
   const reader = new FileReader()
   reader.onload = (e) => {
     ruleForm.privateKeyPem = e.target?.result as string
   }
-  reader.readAsText(uploadFile.raw)
+  reader.readAsText(file.raw)
+  fileListKey.value = files.slice(-1) // 只保留最新的一个文件
+  ruleFormRef.value?.clearValidate('privateKeyPem')
+}
+const handleFileRemoveKey = () => {
+  fileListKey.value = []
+  ruleForm.privateKeyPem = ''
 }
 // 表单重置
 const resetForm = (formEl: FormInstance | undefined) => {
@@ -270,35 +295,46 @@ const resetForm = (formEl: FormInstance | undefined) => {
 }
 // 表单提交
 const submitForm = async (formEl: FormInstance | undefined) => {
-  if (!formEl) return
-  await formEl.validate(async (valid, fields) => {
-    if (valid) {
-      console.log('submit!', valid)
-      const rawForm = toRaw(ruleForm)
-      const params = {
-        certificatePem: rawForm.certificatePem,
-        privateKeyPem: rawForm.privateKeyPem,
-        name: rawForm.name,
-        allowDuplicate: rawForm.allowDuplicate,
-        disableIntegrityCheck: rawForm.disableIntegrityCheck,
-        tags: rawForm.tags
+  try {
+    if (!formEl) return
+    await formEl.validate(async (valid, fields) => {
+      const tagsValid = await tagInputRef.value?.validate()
+      if (valid && tagsValid) {
+        console.log('submit!', valid)
+        const rawForm = toRaw(ruleForm)
+        const params = {
+          certificatePem: rawForm.certificatePem,
+          privateKeyPem: rawForm.privateKeyPem,
+          name: rawForm.name,
+          allowDuplicate: rawForm.allowDuplicate,
+          disableIntegrityCheck: rawForm.disableIntegrityCheck,
+          tags: rawForm.tags
+        }
+        loading.value = true
+        const { code } = await apiCreateCert(params)
+        loading.value = false
+        if (code === 200) {
+          ElMessage.success('创建成功')
+          handleCancel(ruleFormRef.value)
+        }
+      } else {
+        console.log('error submit!', fields)
       }
-      console.log(params)
-      const { data, code } = await apiCreateCert(params)
-      if (code === 200) {
-        console.log(data, 'data')
-        handleCancel(ruleFormRef.value)
-      }
-    } else {
-      console.log('error submit!', fields)
-    }
-  })
+    })
+  } catch {
+    loading.value = false
+  }
 }
 // 取消
 const handleCancel = (formEl: FormInstance | undefined) => {
   visible.value = false
   if (!formEl) return
-  formEl.resetFields()
+  Object.assign(ruleForm, initialForm) // 重置为初始值
+  ruleForm.tags = []
+  formEl.clearValidate() // 清除校验信息
+  fileList.value = [] // 清空上传的文件
+  fileListKey.value = []
+  tagInputRef.value?.onReset() // 清空标签输入框
 }
 </script>
 

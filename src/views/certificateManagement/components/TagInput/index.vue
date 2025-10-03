@@ -2,24 +2,21 @@
   <div class="tag-input">
     <!-- 已有标签 -->
     <div v-if="modelValue.length > 0" class="form-item-tag">
-      <el-form :model="form" :rules="rules" ref="formRef">
-        <el-form-item prop="tags">
-          <div v-for="(tag, index) in modelValue" :key="index" class="item-tag">
+      <el-form :model="form" ref="formRef">
+        <div v-for="(tag, index) in modelValue" :key="index" class="item-tag">
+          <el-form-item :prop="`tags.${index}`" :rules="tagRules">
             <el-input
               v-model="form.tags[index]"
               placeholder="请输入标签"
               maxlength="50"
               @update:modelValue="updateTag($event, index)"
+              clearable
             />
-            <el-icon class="cursor-pointer" @click="removeTag(index)">
-              <Delete />
-            </el-icon>
-          </div>
-        </el-form-item>
-
-        <!-- <el-form-item>
-          <el-button type="primary" @click="onSubmit">提交</el-button>
-        </el-form-item> -->
+          </el-form-item>
+          <el-icon class="cursor-pointer" @click="removeTag(index)">
+            <Delete />
+          </el-icon>
+        </div>
       </el-form>
     </div>
     <!-- 添加标签 -->
@@ -51,7 +48,7 @@ const formRef = ref()
 const isValid = ref(true)
 
 const form = reactive({
-  tags: [''] // 初始一个空标签
+  tags: props.modelValue // 直接同步外部值
 })
 // 校验整个表单并通知父组件
 const validateForm = () => {
@@ -62,28 +59,27 @@ const validateForm = () => {
     emit('valid-change', valid) // 通知父组件校验状态
   })
 }
-watch(
-  () => props.modelValue,
-  (newVal) => {
-    form.tags = [...newVal]
-    validateForm() // 值变化时重新校验
-  },
-  { immediate: true }
-)
-const rules = {
-  tags: [
-    {
-      required: true,
-      validator: (rule: any, value: string[], callback: any) => {
-        if (value.some((t) => !t.trim())) {
-          return callback(new Error('标签内容不能为空'))
-        }
-        return callback()
-      },
-      trigger: 'change'
-    }
-  ]
-}
+// watch(
+//   () => props.modelValue,
+//   (newVal) => {
+//     form.tags = [...newVal]
+//     validateForm() // 值变化时重新校验
+//   },
+//   { immediate: true }
+// )
+// 校验规则
+const tagRules = [
+  {
+    required: true,
+    validator: (rule: any, value: string, callback: any) => {
+      if (!value || !value.trim()) {
+        return callback(new Error('标签内容不能为空'))
+      }
+      return callback()
+    },
+    trigger: 'change'
+  }
+]
 
 // 提供给外部使用的校验方法
 const validate = (): Promise<boolean> => {
@@ -92,28 +88,23 @@ const validate = (): Promise<boolean> => {
       resolve(true)
       return
     }
-
     formRef.value.validate((valid: boolean) => {
-      isValid.value = valid
-      emit('valid-change', valid)
+      // isValid.value = valid
+      // emit('valid-change', valid)
+      console.log('valid', valid)
       resolve(valid)
     })
   })
 }
+const onReset = () => {
+  ;(formRef.value as any).resetFields()
+}
 // 暴露方法给父组件调用
 defineExpose({
   validate,
-  isValid: () => isValid.value
+  isValid: () => isValid.value,
+  onReset
 })
-const onSubmit = () => {
-  ;(formRef.value as any).validate((valid: boolean) => {
-    if (valid) {
-      ElMessage.success('校验通过！')
-    } else {
-      ElMessage.error('表单校验未通过！')
-    }
-  })
-}
 const addTag = () => {
   if (props.modelValue.length >= max) return
   emit('update:modelValue', [...props.modelValue, ''])
@@ -138,7 +129,7 @@ const updateTag = (val: string, index: number) => {
 .form-item-tag {
   .item-tag {
     width: 100%;
-    margin-top: 10px;
+    margin-top: 15px;
     display: flex;
     align-items: center;
     :deep(.el-input) {
@@ -153,6 +144,7 @@ const updateTag = (val: string, index: number) => {
   align-items: center;
   gap: 5px;
   font-size: 13px;
+  margin-top: 10px;
   > span:nth-child(1) {
     display: flex;
     gap: 5px;
