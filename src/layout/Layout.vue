@@ -58,7 +58,7 @@ export default defineComponent({
 
         <Backtop></Backtop>
 
-        {!unref(hideSetting) && <Setting></Setting>}
+        {/* {!unref(hideSetting) && <Setting></Setting>} */}
       </section>
     )
   }
