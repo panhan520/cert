@@ -1,8 +1,11 @@
 import axios, { AxiosError } from 'axios'
-import { defaultRequestInterceptors, defaultResponseInterceptors } from './config'
+import {
+  defaultRequestInterceptors,
+  defaultResponseInterceptors,
+  defaultResponseInterceptorsCatch
+} from './config'
 
 import { AxiosInstance, InternalAxiosRequestConfig, RequestConfig, AxiosResponse } from './types'
-import { ElMessage } from 'element-plus'
 import { REQUEST_TIMEOUT } from '@/constants'
 
 export const PATH_URL = import.meta.env.VITE_API_BASE_PATH
@@ -33,14 +36,17 @@ axiosInstance.interceptors.response.use(
     return res
   },
   (error: AxiosError) => {
-    console.log('err： ' + error) // for debug
-    ElMessage.error(error.message)
+    const url = error.config?.url || ''
+    abortControllerMap.delete(url)
     return Promise.reject(error)
   }
 )
 
 axiosInstance.interceptors.request.use(defaultRequestInterceptors)
-axiosInstance.interceptors.response.use(defaultResponseInterceptors)
+axiosInstance.interceptors.response.use(
+  defaultResponseInterceptors,
+  defaultResponseInterceptorsCatch
+)
 
 const service = {
   request: (config: RequestConfig) => {

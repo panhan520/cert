@@ -59,12 +59,61 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="subjectNames" label="绑定域名">
+      <el-table-column prop="subjectNames" label="绑定域名" min-width="200">
         <template #default="scope">
-          <div v-for="item in scope.row.subjectNames" :key="item">
-            <el-tooltip class="box-item" placement="top" effect="light" :content="item">
-              <el-tag type="info" class="bottom-10">{{ item }}</el-tag>
-            </el-tooltip>
+          <div
+            v-if="!scope.row.subjectNames || scope.row.subjectNames.length === 0"
+            class="domain-empty"
+          >
+            --
+          </div>
+          <div v-else class="domain-list-container">
+            <div class="domain-display">
+              <div
+                v-for="(item, index) in scope.row.subjectNames.slice(0, 2)"
+                :key="`${scope.row.id}-${index}`"
+                class="domain-item"
+              >
+                <el-tooltip class="box-item" placement="top" effect="light" :content="item">
+                  <el-tag type="info" class="domain-tag">{{ truncateText(item) }}</el-tag>
+                </el-tooltip>
+              </div>
+            </div>
+            <el-popover
+              v-if="scope.row.subjectNames.length > 2"
+              placement="left"
+              :width="280"
+              trigger="hover"
+              popper-class="domain-popover"
+            >
+              <template #reference>
+                <div class="domain-more" @click.stop>
+                  +{{ scope.row.subjectNames.length - 2 }}
+                </div>
+              </template>
+              <div class="domain-list-popover">
+                <div class="domain-list-scroll">
+                  <div
+                    v-for="(item, index) in scope.row.subjectNames.slice(2)"
+                    :key="`popover-${scope.row.id}-${index + 2}`"
+                    class="domain-list"
+                  >
+                    <div class="domain-popover-item">
+                      <el-tooltip class="box-item" placement="top" effect="light" :content="item">
+                        <span class="domain-popover-text">{{ item }}</span>
+                      </el-tooltip>
+                    </div>
+                  </div>
+                </div>
+                <el-button
+                  type="primary"
+                  class="domain-copy-btn"
+                  @click="handleCopyDomains(scope.row.subjectNames)"
+                >
+                  复制
+                </el-button>
+              </div>
+            </el-popover>
           </div>
         </template>
       </el-table-column>
@@ -182,6 +231,7 @@ import { CertsList, CertsParams } from '@/api/certificate/type'
 import { statusMap, statusOptions, statusImgMap } from './constants'
 import { Pagination } from '@/components/Pagination'
 import { ElMessage } from 'element-plus'
+import { useClipboard } from '@/hooks/web/useClipboard'
 const uploadCertificateVisible = ref(false)
 const editTagsVisible = ref(false)
 const deleteDialogVisible = ref(false)
@@ -219,7 +269,12 @@ onMounted(() => {
 const getList = async () => {
   try {
     loading.value = true
-    const { data, code } = await apiGetCertsList(queryParams.value)
+    console.log('queryParams.value', queryParams.value)
+    const params = {
+      ...queryParams.value,
+      tags: [...queryParams.value.tags] // 解构 Proxy 数组为普通数组
+    }
+    const { data, code } = await apiGetCertsList(params)
     loading.value = false
     if (code === 200) {
       tableData.value = data.list
@@ -340,6 +395,37 @@ const onRefresh = () => {
   console.log(queryParams.value)
   getList()
 }
+
+// 域名相关函数
+const truncateText = (text: string, maxLength: number = 30) => {
+  if (!text) return ''
+  return text.length > maxLength ? text.substring(0, maxLength) + '...' : text
+}
+
+const { copy, isSupported, copied } = useClipboard()
+
+const handleCopyDomains = (domains: string[]) => {
+  if (!domains || domains.length === 0) {
+    ElMessage.warning('没有可复制的域名')
+    return
+  }
+
+  const domainsText = domains.join('\n')
+
+  if (!isSupported.value) {
+    ElMessage.error('您的浏览器不支持复制功能')
+    return
+  }
+
+  copy(domainsText)
+
+  // 使用 setTimeout 等待 copied 状态更新
+  setTimeout(() => {
+    if (copied.value) {
+      ElMessage.success('复制成功')
+    }
+  }, 100)
+}
 </script>
 <style lang="less" scoped>
 .el-radio {
@@ -425,5 +511,96 @@ const onRefresh = () => {
 }
 .el-table__cell:hover .edit-icon {
   display: inline-block; /* 鼠标浮动时显示 */
+}
+
+// 域名列表样式
+.domain-empty {
+  color: #909399;
+}
+
+.domain-list-container {
+  gap: 8px;
+}
+
+.domain-display {
+}
+
+.domain-item {
+  max-width: 100%;
+  margin-bottom: 3px;
+}
+
+.domain-tag {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+  line-height: 24px;
+}
+
+.domain-more {
+  display: inline-block;
+  padding: 2px 8px;
+  background: #f4f4f5;
+  border-radius: 4px;
+  color: #909399;
+  font-size: 12px;
+  cursor: pointer;
+  line-height: 20px;
+
+  &:hover {
+    background: #e4e7ed;
+  }
+}
+</style>
+
+<style lang="less">
+.domain-popover {
+  padding: 0 !important;
+}
+
+.domain-list-popover {
+  padding: 12px;
+  text-align: center;
+}
+
+.domain-list-scroll {
+  max-height: 200px;
+  overflow-y: auto;
+  margin-bottom: 10px;
+  text-align: left;
+}
+.domain-list {
+  display: block;
+  margin-bottom: 3px;
+}
+
+.domain-popover-item {
+  display: inline-block;
+  padding: 3px 5px 2px;
+  background: #f5f7fa;
+  border-radius: 4px;
+  margin-bottom: 8px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  .domain-popover-text {
+    display: inline-block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 13px;
+    color: #606266;
+    cursor: default;
+  }
+}
+
+.domain-copy-btn {
+  border-radius: 4px;
+  margin: auto;
 }
 </style>

@@ -50,4 +50,30 @@ const defaultResponseInterceptors = (response: AxiosResponse) => {
   }
 }
 
-export { defaultResponseInterceptors, defaultRequestInterceptors }
+const defaultResponseInterceptorsCatch = (error: any) => {
+  console.log('err： ' + error) // for debug
+
+  if (error.response) {
+    // 服务器返回了错误状态码（如 400, 404, 500 等）
+    const { status, data } = error.response
+    const errorMessage = data?.message || data?.error || `请求失败 (${status})`
+
+    ElMessage.error(errorMessage)
+
+    // 处理 401 未授权错误
+    if (status === 401) {
+      const userStore = useUserStoreWithOut()
+      userStore.logout()
+    }
+  } else if (error.request) {
+    // 请求已发出但没有收到响应
+    ElMessage.error('网络错误，请检查您的网络连接')
+  } else {
+    // 其他错误
+    ElMessage.error(error.message || '请求失败')
+  }
+
+  return Promise.reject(error)
+}
+
+export { defaultResponseInterceptors, defaultResponseInterceptorsCatch, defaultRequestInterceptors }
