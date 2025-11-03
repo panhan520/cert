@@ -33,39 +33,6 @@ export const constantRouterMap: AppRouteRecordRaw[] = [
       hidden: true,
       noTagsView: true
     }
-  },
-  {
-    path: '/login',
-    component: () => import('@/views/Login/Login.vue'),
-    name: 'Login',
-    meta: {
-      hidden: true,
-      title: t('router.login'),
-      noTagsView: true
-    }
-  },
-  {
-    path: '/personal',
-    component: Layout,
-    redirect: '/personal/personal-center',
-    name: 'Personal',
-    meta: {
-      title: t('router.personal'),
-      hidden: true,
-      canTo: true
-    },
-    children: [
-      {
-        path: 'personal-center',
-        component: () => import('@/views/Personal/PersonalCenter/PersonalCenter.vue'),
-        name: 'PersonalCenter',
-        meta: {
-          title: t('router.personalCenter'),
-          hidden: true,
-          canTo: true
-        }
-      }
-    ]
   }
   // {
   //   path: '/404',

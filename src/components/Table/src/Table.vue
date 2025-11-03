@@ -17,7 +17,6 @@ import { set, get } from 'lodash-es'
 import { CSSProperties } from 'vue'
 import { getSlot } from '@/utils/tsxHelper'
 import TableActions from './components/TableActions.vue'
-import { createVideoViewer } from '@/components/VideoPlayer'
 import { Icon } from '@/components/Icon'
 import { BaseButton } from '@/components/Button'
 
@@ -408,9 +407,8 @@ export default defineComponent({
               type="primary"
               icon={<Icon icon="vi-ep:video-play" />}
               onClick={() => {
-                createVideoViewer({
-                  url
-                })
+                // 视频预览功能已移除
+                console.log('视频预览功能已移除', url)
               }}
             >
               预览

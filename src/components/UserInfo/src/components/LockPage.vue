@@ -9,7 +9,6 @@ import { useI18n } from '@/hooks/web/useI18n'
 import { useNow } from '@/hooks/web/useNow'
 import { useDesign } from '@/hooks/web/useDesign'
 import { Icon } from '@/components/Icon'
-import { loginOutApi } from '@/api/login'
 import { useTagsViewStore } from '@/store/modules/tagsView'
 
 const tagsViewStore = useTagsViewStore()
@@ -49,14 +48,11 @@ async function unLock() {
 
 // 返回登录
 async function goLogin() {
-  const res = await loginOutApi().catch(() => {})
-  if (res) {
-    clear()
-    tagsViewStore.delAllViews()
-    resetRouter() // 重置静态路由表
-    lockStore.resetLockInfo()
-    replace('/login')
-  }
+  clear()
+  tagsViewStore.delAllViews()
+  resetRouter() // 重置静态路由表
+  lockStore.resetLockInfo()
+  // qiankun 子应用不跳转登录页
 }
 
 function handleShowForm(show = false) {

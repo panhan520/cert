@@ -9,11 +9,9 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     ActionButton: typeof import('./src/components/Search/src/components/ActionButton.vue')['default']
-    Avatars: typeof import('./src/components/Avatars/src/Avatars.vue')['default']
     Backtop: typeof import('./src/components/Backtop/src/Backtop.vue')['default']
     Breadcrumb: typeof import('./src/components/Breadcrumb/src/Breadcrumb.vue')['default']
     Button: typeof import('./src/components/Button/src/Button.vue')['default']
-    CodeEditor: typeof import('./src/components/CodeEditor/src/CodeEditor.vue')['default']
     Collapse: typeof import('./src/components/Collapse/src/Collapse.vue')['default']
     ColorRadioPicker: typeof import('./src/components/Setting/src/components/ColorRadioPicker.vue')['default']
     ColumnSetting: typeof import('./src/components/Table/src/components/ColumnSetting.vue')['default']
@@ -46,8 +44,6 @@ declare module 'vue' {
     ElTag: typeof import('element-plus/es')['ElTag']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
     ElUpload: typeof import('element-plus/es')['ElUpload']
-    Error: typeof import('./src/components/Error/src/Error.vue')['default']
-    Footer: typeof import('./src/components/Footer/src/Footer.vue')['default']
     Form: typeof import('./src/components/Form/src/Form.vue')['default']
     Highlight: typeof import('./src/components/Highlight/src/Highlight.vue')['default']
     IAgree: typeof import('./src/components/IAgree/src/IAgree.vue')['default']
@@ -55,7 +51,6 @@ declare module 'vue' {
     IconPicker: typeof import('./src/components/IconPicker/src/IconPicker.vue')['default']
     ImageCropping: typeof import('./src/components/ImageCropping/src/ImageCropping.vue')['default']
     ImageViewer: typeof import('./src/components/ImageViewer/src/ImageViewer.vue')['default']
-    Infotip: typeof import('./src/components/Infotip/src/Infotip.vue')['default']
     InputPassword: typeof import('./src/components/InputPassword/src/InputPassword.vue')['default']
     InterfaceDisplay: typeof import('./src/components/Setting/src/components/InterfaceDisplay.vue')['default']
     JsonEditor: typeof import('./src/components/JsonEditor/src/JsonEditor.vue')['default']
@@ -81,11 +76,7 @@ declare module 'vue' {
     TabMenu: typeof import('./src/components/TabMenu/src/TabMenu.vue')['default']
     TagsView: typeof import('./src/components/TagsView/src/TagsView.vue')['default']
     ThemeSwitch: typeof import('./src/components/ThemeSwitch/src/ThemeSwitch.vue')['default']
-    Tree: typeof import('./src/components/Tree/src/Tree.vue')['default']
     UserInfo: typeof import('./src/components/UserInfo/src/UserInfo.vue')['default']
-    VideoPlayer: typeof import('./src/components/VideoPlayer/src/VideoPlayer.vue')['default']
-    VideoPlayerViewer: typeof import('./src/components/VideoPlayerViewer/src/VideoPlayerViewer.vue')['default']
-    Waterfall: typeof import('./src/components/Waterfall/src/Waterfall.vue')['default']
   }
   export interface GlobalDirectives {
     vLoading: typeof import('element-plus/es')['ElLoadingDirective']

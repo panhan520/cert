@@ -40,9 +40,16 @@ import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import './permission'
 
 let app: any = null
+
+// qiankun props 全局存储
+export let qiankunProps: QiankunProps = {}
+
 // 创建实例
-async function render(props: any = {}) {
+async function render(props: QiankunProps = {}) {
   app = createApp(App)
+
+  // 存储 qiankun props，供其他地方使用
+  qiankunProps = props
 
   await setupI18n(app)
   setupStore(app)

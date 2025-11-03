@@ -6,7 +6,6 @@ import VueJsx from '@vitejs/plugin-vue-jsx'
 import progress from 'vite-plugin-progress'
 import EslintPlugin from 'vite-plugin-eslint'
 import { ViteEjsPlugin } from 'vite-plugin-ejs'
-import { viteMockServe } from 'vite-plugin-mock'
 import PurgeIcons from 'vite-plugin-purge-icons'
 import ServerUrlCopy from 'vite-plugin-url-copy'
 import VueI18nPlugin from '@intlify/unplugin-vue-i18n/vite'
@@ -85,19 +84,6 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
         svgoOptions: true
       }),
       PurgeIcons(),
-      env.VITE_USE_MOCK === 'true'
-        ? viteMockServe({
-            ignore: /^\_/,
-            mockPath: 'mock',
-            localEnabled: !isBuild,
-            prodEnabled: isBuild,
-            injectCode: `
-          import { setupProdMockServer } from '../mock/_createProductionServer'
-
-          setupProdMockServer()
-          `
-          })
-        : undefined,
       ViteEjsPlugin({
         title: env.VITE_APP_TITLE
       }),
@@ -157,7 +143,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
         // 选项写法
         '/apis': {
           target: 'http://172.31.36.140:11001',
-          changeOrigin: true,
+          changeOrigin: true
         }
       },
       hmr: {

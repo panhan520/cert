@@ -7,6 +7,7 @@ import { usePermissionStoreWithOut } from '@/store/modules/permission'
 import { usePageLoading } from '@/hooks/web/usePageLoading'
 import { NO_REDIRECT_WHITE_LIST } from '@/constants'
 import { useUserStoreWithOut } from '@/store/modules/user'
+import { qiankunProps } from '@/main'
 
 const { start, done } = useNProgress()
 
@@ -19,43 +20,35 @@ router.beforeEach(async (to, from, next) => {
   const appStore = useAppStoreWithOut()
   const userStore = useUserStoreWithOut()
   const isAuth = false
+
+  // qiankun 子应用，从主应用传递 token 和用户信息
+  if (window.__POWERED_BY_QIANKUN__ && !userStore.getToken) {
+    // 尝试从 qiankun props 获取登录信息
+    if (qiankunProps.token) {
+      userStore.setToken(qiankunProps.token)
+    }
+    if (qiankunProps.userInfo) {
+      userStore.setUserInfo(qiankunProps.userInfo)
+    }
+  }
+
   if (userStore.getUserInfo || !isAuth) {
-    if (to.path === '/login') {
-      next({ path: '/' })
-    } else {
-      if (permissionStore.getIsAddRouters) {
-        next()
-        return
-      }
-
-      // 开发者可根据实际情况进行修改
-      const roleRouters = userStore.getRoleRouters || []
-
-      // 是否使用动态路由
-      // if (appStore.getDynamicRouter) {
-      //   appStore.serverDynamicRouter
-      //     ? await permissionStore.generateRoutes('server', roleRouters as AppCustomRouteRecordRaw[])
-      //     : await permissionStore.generateRoutes('frontEnd', roleRouters as string[])
-      // } else {
-      //   await permissionStore.generateRoutes('static')
-      // }
-      await permissionStore.generateRoutes('static')
-      permissionStore.getAddRouters.forEach((route) => {
-        router.addRoute(route as unknown as RouteRecordRaw) // 动态添加可访问路由表
-      })
-      const redirectPath = from.query.redirect || to.path
-      const redirect = decodeURIComponent(redirectPath as string)
-      const nextData = to.path === redirect ? { ...to, replace: true } : { path: redirect }
-      permissionStore.setIsAddRouters(true)
-      console.log(nextData)
-      next(nextData)
-    }
-  } else {
-    if (NO_REDIRECT_WHITE_LIST.indexOf(to.path) !== -1) {
+    if (permissionStore.getIsAddRouters) {
       next()
-    } else {
-      next(`/login?redirect=${to.path}`) // 否则全部重定向到登录页
+      return
     }
+
+    await permissionStore.generateRoutes('static')
+    permissionStore.getAddRouters.forEach((route) => {
+      router.addRoute(route as unknown as RouteRecordRaw)
+    })
+    const redirectPath = from.query.redirect || to.path
+    const redirect = decodeURIComponent(redirectPath as string)
+    const nextData = to.path === redirect ? { ...to, replace: true } : { path: redirect }
+    permissionStore.setIsAddRouters(true)
+    next(nextData)
+  } else {
+    next()
   }
 })
 
