@@ -7,6 +7,7 @@ import { useRenderMenuItem } from './components/useRenderMenuItem'
 import { useRouter } from 'vue-router'
 import { isUrl } from '@/utils/is'
 import { useDesign } from '@/hooks/web/useDesign'
+import { Icon } from '@/components/Icon'
 
 const { getPrefixCls } = useDesign()
 
@@ -106,19 +107,38 @@ export default defineComponent({
       )
     }
 
+    const toggleCollapse = () => {
+      appStore.setCollapse(!unref(collapse))
+    }
+
     return () => (
       <div
         id={prefixCls}
         class={[
           `${prefixCls} ${prefixCls}__${unref(menuMode)}`,
-          'h-[100%] overflow-hidden flex-col bg-[var(--left-menu-bg-color)]',
+          'h-[100%] overflow-hidden flex flex-col bg-[var(--left-menu-bg-color)]',
           {
             'w-[var(--left-menu-min-width)]': unref(collapse) && unref(layout) !== 'cutMenu',
             'w-[var(--left-menu-max-width)]': !unref(collapse) && unref(layout) !== 'cutMenu'
           }
         ]}
       >
-        {renderMenuWrap()}
+        <div class="flex-1 overflow-hidden">{renderMenuWrap()}</div>
+        {/* 底部折叠按钮 */}
+        <div
+          class="flex items-center justify-center h-12  bottomCollapseButton"
+          onClick={toggleCollapse}
+        >
+          <Icon
+            size={18}
+            icon={
+              unref(collapse)
+                ? 'vi-ant-design:menu-unfold-outlined'
+                : 'vi-ant-design:menu-fold-outlined'
+            }
+            color="var(--left-menu-text-color)"
+          />
+        </div>
       </div>
     )
   }
@@ -184,6 +204,14 @@ export default defineComponent({
       position: relative;
       background-color: var(--left-menu-collapse-bg-active-color) !important;
     }
+
+    // 折叠时图标居中
+    .@{elNamespace}-menu-item,
+    .@{elNamespace}-sub-menu__title {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
   }
 
   // 折叠动画的时候，就需要把文字给隐藏掉
@@ -223,6 +251,12 @@ export default defineComponent({
       }
     }
   }
+}
+.bottomCollapseButton {
+  position: absolute;
+  bottom: 40px;
+  left: 20px;
+  cursor: pointer;
 }
 </style>
 
