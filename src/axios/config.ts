@@ -25,7 +25,19 @@ const defaultRequestInterceptors = (config: InternalAxiosRequestConfig) => {
     const keys = Object.keys(config.params)
     for (const key of keys) {
       if (config.params[key] !== void 0 && config.params[key] !== null) {
-        url += `${key}=${encodeURIComponent(config.params[key])}&`
+        const value = config.params[key]
+        if (Array.isArray(value)) {
+          // 处理数组参数，使用 qs.stringify 序列化，arrayFormat: 'repeat' 表示 tags=value1&tags=value2
+          if (value.length > 0) {
+            const arrayParams = { [key]: value }
+            const serialized = qs.stringify(arrayParams, { arrayFormat: 'repeat' })
+            if (serialized) {
+              url += serialized + '&'
+            }
+          }
+        } else {
+          url += `${key}=${encodeURIComponent(value)}&`
+        }
       }
     }
     url = url.substring(0, url.length - 1)

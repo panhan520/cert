@@ -59,7 +59,7 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="subjectNames" label="绑定域名" min-width="200">
+      <el-table-column prop="subjectNames" label="绑定域名" width="350">
         <template #default="scope">
           <div
             v-if="!scope.row.subjectNames || scope.row.subjectNames.length === 0"
@@ -269,12 +269,7 @@ onMounted(() => {
 const getList = async () => {
   try {
     loading.value = true
-    console.log('queryParams.value', queryParams.value)
-    const params = {
-      ...queryParams.value,
-      tags: [...queryParams.value.tags] // 解构 Proxy 数组为普通数组
-    }
-    const { data, code } = await apiGetCertsList(params)
+    const { data, code } = await apiGetCertsList(queryParams.value)
     loading.value = false
     if (code === 200) {
       tableData.value = data.list
@@ -397,7 +392,7 @@ const onRefresh = () => {
 }
 
 // 域名相关函数
-const truncateText = (text: string, maxLength: number = 30) => {
+const truncateText = (text: string, maxLength: number = 50) => {
   if (!text) return ''
   return text.length > maxLength ? text.substring(0, maxLength) + '...' : text
 }
@@ -520,9 +515,6 @@ const handleCopyDomains = (domains: string[]) => {
 
 .domain-list-container {
   gap: 8px;
-}
-
-.domain-display {
 }
 
 .domain-item {
