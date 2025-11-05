@@ -140,7 +140,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       proxy: {
         // 选项写法
         '/apis': {
-          target: 'http://172.31.36.140:11001',
+          target: 'https://www.dev.wafscloud.com',
           changeOrigin: true
         }
       },
