@@ -32,7 +32,6 @@
 <script setup lang="ts">
 import { Delete, CirclePlus } from '@element-plus/icons-vue'
 import { ref, reactive, onMounted, watch } from 'vue'
-import { ElMessage } from 'element-plus'
 const props = defineProps<{
   modelValue: string[]
   max?: number
@@ -46,7 +45,6 @@ const emit = defineEmits<{
 const max = props.max ?? 50
 const formRef = ref()
 const isValid = ref(true)
-
 const form = reactive({
   tags: props.modelValue // 直接同步外部值
 })
@@ -59,14 +57,14 @@ const validateForm = () => {
     emit('valid-change', valid) // 通知父组件校验状态
   })
 }
-// watch(
-//   () => props.modelValue,
-//   (newVal) => {
-//     form.tags = [...newVal]
-//     validateForm() // 值变化时重新校验
-//   },
-//   { immediate: true }
-// )
+// 同步外部传入的标签
+watch(
+  () => props.modelValue,
+  (newVal) => {
+    form.tags = [...newVal]
+  },
+  { immediate: true }
+)
 // 校验规则
 const tagRules = [
   {

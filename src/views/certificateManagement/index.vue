@@ -206,7 +206,7 @@
       :page-sizes="[10, 20, 50, 100]"
       @change="handlePageChange"
     />
-    <UploadCert v-model:visible="uploadCertificateVisible" />
+    <UploadCert v-model:visible="uploadCertificateVisible" @upLoadDone="upLoadDone" />
     <EditTags
       ref="editTagsRef"
       v-model:visible="editTagsVisible"
@@ -248,7 +248,7 @@ interface CertOption {
 const certOptions = ref<CertOption[]>([])
 
 const currentStatus = ref('CERT_STATUS_ALL')
-const tagList = ref([])
+const tagList = ref<string[]>([])
 const rowTableList = ref<any[]>([])
 
 const tableData = ref<CertsList[]>([])
@@ -292,6 +292,11 @@ const getCertTotalData = async () => {
       ...data.total
     ]
   }
+}
+// 上传证书完成
+const upLoadDone = () => {
+  getList()
+  getCertTotalData()
 }
 // 更新证书
 const updateCertData = async (params: any) => {

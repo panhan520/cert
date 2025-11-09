@@ -14,9 +14,6 @@
         <div class="info">
           <el-icon><WarningFilled color="#1759dd" /></el-icon>
           <ul>
-            <li>
-              您可以将第三方证书服务商处导出的证书上传托管至火山引擎证书中心，便于统一管理及使用。
-            </li>
             <li>上传证书时，证书文件和私钥文件都是必须的。</li>
           </ul>
         </div>
@@ -202,7 +199,7 @@ const props = defineProps({
     default: false
   }
 })
-const emit = defineEmits(['update:visible'])
+const emit = defineEmits(['update:visible', 'upLoadDone'])
 const visible = computed({
   get: () => props.visible,
   set: (val) => emit('update:visible', val)
@@ -315,6 +312,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
         loading.value = false
         if (code === 200) {
           ElMessage.success('创建成功')
+          emit('upLoadDone')
           handleCancel(ruleFormRef.value)
         }
       } else {
