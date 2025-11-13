@@ -9,29 +9,30 @@
 
     <!-- 右侧搜索/筛选 + 刷新 -->
     <div class="toolbar-right">
-      <el-select
-        v-if="searchOptions && searchOptions.length > 0"
-        v-model="selectValue"
-        placeholder="请选择"
-        style="width: 120px"
-        @change="changeSelect"
-      >
-        <el-option
-          v-for="option in searchOptions"
-          :key="option.value"
-          :label="option.label"
-          :value="option.value"
-        />
-      </el-select>
-
       <el-input
         v-model="searchParams[selectValue]"
-        placeholder="请输入关键字"
+        :placeholder="selectValue === 'subjectKeyword' ? '搜索域名' : '搜索备注名称'"
         @input="handleInput"
         clearable
         @keyup.enter="handleSearch"
-        style="width: 200px; margin-left: 8px"
-      />
+        style="width: 350px"
+      >
+        <template #prepend>
+          <el-select
+            v-if="searchOptions && searchOptions.length > 0"
+            v-model="selectValue"
+            placeholder="请选择"
+            style="width: 120px; background: #ffffff"
+            @change="changeSelect"
+          >
+            <el-option
+              v-for="option in searchOptions"
+              :key="option.value"
+              :label="option.label"
+              :value="option.value"
+            />
+          </el-select> </template
+      ></el-input>
       <!-- <el-input
         v-if="selectValue === 'subjectKeyword'"
         v-model="searchParams[searchParams.subjectKeyword]"

@@ -343,7 +343,6 @@ const handleCancel = (formEl: FormInstance | undefined) => {
 .info {
   display: flex;
   padding: 9px 24px;
-  gap: 8px;
   background-color: #f4f7ff;
   margin-bottom: 16px;
   font-size: 13px;
@@ -355,7 +354,6 @@ const handleCancel = (formEl: FormInstance | undefined) => {
     list-style: none;
     li {
       line-height: 22px;
-      list-style: disc;
     }
   }
 }

@@ -58,10 +58,11 @@ watch(
       ]"
       to="/"
     >
-      <img
+      <div class="logo-icon"> <i class="fa-solid fa-file-shield"></i></div>
+      <!-- <img
         src="@/assets/imgs/logo.png"
         class="w-[calc(var(--logo-height)-10px)] h-[calc(var(--logo-height)-10px)]"
-      />
+      /> -->
       <div
         v-if="show"
         :class="[
@@ -78,3 +79,9 @@ watch(
     </router-link>
   </div>
 </template>
+<style lang="less" scoped>
+.logo-icon {
+  color: #1664ff;
+  font-size: 18px;
+}
+</style>
