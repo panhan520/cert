@@ -125,7 +125,7 @@
           </div>
         </el-form-item>
         <el-form-item label="备注名称" prop="name">
-          <el-input v-model="ruleForm.name" maxlength="68" />
+          <el-input v-model="ruleForm.name" maxlength="64" />
         </el-form-item>
         <el-form-item label="标签">
           <template #label>
