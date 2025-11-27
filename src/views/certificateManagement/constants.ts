@@ -5,8 +5,8 @@ import status4 from '@/assets/imgs/status4.svg'
 import status5 from '@/assets/imgs/status5.svg'
 
 export const statusMap: Record<string, string> = {
-  CERT_STATUS_EXPIRES_SOON: '即将过期',
-  CERT_STATUS_EXPIRED: '已过期',
+  CERT_STATUS_EXPIRES_SOON: '即将到期（30天内）',
+  CERT_STATUS_EXPIRED: '已到期',
   CERT_STATUS_ISSUE: '已签发',
   CERT_STATUS_ABNORMAL: '异常',
   CERT_STATUS_UNUSED: '未使用',
