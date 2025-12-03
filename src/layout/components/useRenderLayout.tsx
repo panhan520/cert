@@ -62,7 +62,7 @@ export const useRenderLayout = () => {
           ]}
           style="transition: all var(--transition-time-02);"
         >
-          <ElScrollbar v-loading={pageLoading.value} style="height:94vh !important;">
+          <ElScrollbar v-loading={pageLoading.value} style="height:100vh !important;">
             <AppView></AppView>
           </ElScrollbar>
         </div>
