@@ -15,12 +15,11 @@
       class="create-template-form"
     >
       <!-- 基本信息 -->
-      <div class="form-section">
+      <div class="form-section basic-info">
         <div class="section-title">
           <div class="title-bar"></div>
           <span>基本信息</span>
         </div>
-
         <el-form-item label="模板持有者类型" prop="holderType" required>
           <el-radio-group
             v-model="formData.holderType"
@@ -35,13 +34,18 @@
         </el-form-item>
 
         <el-form-item label="模板名称" prop="name" required>
-          <el-input v-model="formData.name" placeholder="请输入模板名称" clearable />
+          <el-input
+            v-model="formData.name"
+            placeholder="请输入模板名称"
+            clearable
+            :max-length="50"
+          />
         </el-form-item>
 
         <el-form-item label="联系人姓名" prop="contactName" required>
           <div class="name-inputs">
-            <el-input v-model="formData.surname" placeholder="姓" clearable />
-            <el-input v-model="formData.givenName" placeholder="名" clearable />
+            <el-input v-model="formData.surname" placeholder="姓" clearable :max-length="50" />
+            <el-input v-model="formData.givenName" placeholder="名" clearable :max-length="50" />
           </div>
         </el-form-item>
 
@@ -66,11 +70,17 @@
             v-model="formData.companyName"
             placeholder="请输入英文全称或营业执照上的中文全称"
             clearable
+            :max-length="50"
           />
         </el-form-item>
 
         <el-form-item label="部门 (OU)">
-          <el-input v-model="formData.department" placeholder="请输入部门" clearable />
+          <el-input
+            v-model="formData.department"
+            placeholder="请输入部门"
+            clearable
+            :max-length="50"
+          />
         </el-form-item>
 
         <el-form-item label="国家/地区 (C/R)" prop="country" required>
@@ -85,19 +95,34 @@
         </el-form-item>
 
         <el-form-item label="省份 (ST)" prop="province" required>
-          <el-input v-model="formData.province" placeholder="请输入省份" clearable />
+          <el-input
+            v-model="formData.province"
+            placeholder="请输入省份"
+            clearable
+            :max-length="50"
+          />
         </el-form-item>
 
         <el-form-item label="城市 (L)" prop="city" required>
-          <el-input v-model="formData.city" placeholder="请输入城市" clearable />
+          <el-input v-model="formData.city" placeholder="请输入城市" clearable :max-length="50" />
         </el-form-item>
 
         <el-form-item label="地址 (Street)" prop="address" required>
-          <el-input v-model="formData.address" placeholder="请输入地址" clearable />
+          <el-input
+            v-model="formData.address"
+            placeholder="请输入地址"
+            clearable
+            :max-length="50"
+          />
         </el-form-item>
 
         <el-form-item label="邮编 (PostalCode)">
-          <el-input v-model="formData.postalCode" placeholder="请输入邮编" clearable />
+          <el-input
+            v-model="formData.postalCode"
+            placeholder="请输入邮编"
+            clearable
+            :max-length="50"
+          />
         </el-form-item>
       </div>
 
@@ -190,7 +215,7 @@ const rules: FormRules = {
   givenName: [{ required: true, message: '请输入名', trigger: 'blur' }],
   contactEmail: [
     { required: true, message: '请输入邮箱', trigger: 'blur' },
-    { type: 'email', message: '请输入正确的邮箱格式', trigger: 'blur' }
+    { type: 'email', message: '请输入正确的邮箱', trigger: 'blur' }
   ],
   contactMobile: [
     { required: true, message: '请输入手机号码', trigger: 'blur' },
@@ -369,9 +394,6 @@ watch(
         border-radius: 0 8px 8px 0;
       }
     }
-    :deep(.el-form-item) {
-      margin-bottom: 18px !important;
-    }
     .question-icon {
       vertical-align: middle;
       margin-top: -2px;
@@ -382,6 +404,7 @@ watch(
       color: #909399;
     }
     .name-inputs {
+      width: 100%;
       display: flex;
       gap: 12px;
       .el-input {

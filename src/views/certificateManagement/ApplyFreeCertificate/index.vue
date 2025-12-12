@@ -15,7 +15,7 @@
         class="apply-form"
       >
         <!-- 证书信息 -->
-        <div class="form-section">
+        <div class="form-section basic-info">
           <div class="section-title">
             <div class="title-bar"></div>
             <span>证书信息</span>
@@ -66,6 +66,7 @@
               placeholder="未命名证书"
               clearable
               class="form-item-input"
+              :maxlength="50"
             />
           </el-form-item>
         </div>
@@ -87,7 +88,7 @@
                 </el-tooltip>
               </span>
             </template>
-            <TagInput v-model="formData.tags" :max="50" />
+            <TagInput v-model="formData.tags" :max="5" />
           </el-form-item>
         </div>
         <!-- 操作按钮 -->
@@ -123,7 +124,6 @@ const formData = reactive({
 const rules: FormRules = {
   domain: [{ required: true, message: '请输入域名', trigger: 'blur' }],
   templateId: [{ required: true, message: '请选择信息模板', trigger: 'change' }],
-  verifyMethod: [{ required: true, message: '请选择验证方式', trigger: 'change' }],
   remarkName: [{ required: true, message: '请输入备注名称', trigger: 'blur' }]
 }
 const handleSubmit = async () => {
@@ -188,6 +188,11 @@ const handleBack = () => {
       }
       .form-item-input {
         width: 500px;
+      }
+    }
+    .basic-info {
+      :deep(.el-form-item) {
+        margin-bottom: 22px;
       }
     }
     .question-icon {
