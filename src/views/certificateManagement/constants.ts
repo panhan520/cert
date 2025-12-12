@@ -10,7 +10,8 @@ export const statusMap: Record<string, string> = {
   CERT_STATUS_ISSUE: '已签发',
   CERT_STATUS_ABNORMAL: '异常',
   CERT_STATUS_UNUSED: '未使用',
-  CERT_STATUS_ALL: '全部证书'
+  CERT_STATUS_ALL: '全部证书',
+  CERT_STATUS_VERIFYING: '验证中'
 }
 
 export const statusImgMap: Record<string, string> = {
@@ -18,6 +19,7 @@ export const statusImgMap: Record<string, string> = {
   CERT_STATUS_EXPIRED: status4,
   CERT_STATUS_ISSUE: status2,
   CERT_STATUS_ABNORMAL: status5,
+  CERT_STATUS_VERIFYING: status3,
   CERT_STATUS_ALL: status1
 }
 

@@ -1,7 +1,8 @@
 <template>
   <ContentWrap>
     <div class="page-title">证书管理</div>
-    <ul class="ul-continer">
+    <!-- 状态卡片Tabs -->
+    <ul class="status-container">
       <li
         v-for="item in certOptions"
         :key="item.status"
@@ -15,8 +16,9 @@
         <p>{{ item.total }}</p>
       </li>
     </ul>
+    <!-- 按钮+筛选栏 -->
     <TableToolbar
-      :buttons="[{ key: 'buy', label: '上传证书', onClick: handleUploadCertificate }]"
+      :buttons="toolbarButtons"
       :searchOptions="[
         { label: '备注名称', value: 'nameKeyword' },
         { label: '域名', value: 'subjectKeyword' }
@@ -24,7 +26,7 @@
       @search="onSearch"
       @refresh="onRefresh"
     />
-
+    <!-- 表格 -->
     <el-table :data="tableData" row-key="id" border :loading="loading">
       <el-table-column prop="name" label="证书名称">
         <template #default="scope">
@@ -127,12 +129,7 @@
               @reset="onReset('tags', [])"
             >
               <template #content>
-                <TagInput
-                  ref="tagInputRef"
-                  v-model="queryParams.tags"
-                  :max="20"
-                  @valid-change="onValidChange"
-                />
+                <TagInput ref="tagInputRef" v-model="queryParams.tags" :max="20" />
               </template>
             </TableFilterPopover>
           </div>
@@ -178,7 +175,23 @@
           </div>
         </template>
         <template #default="scope">
-          {{ statusMap[scope.row.status] || '-' }}
+          <div v-if="scope.row.status === 'CERT_STATUS_VERIFYING'" class="status-verifying">
+            <span>{{ statusMap[scope.row.status] || '-' }}</span>
+            <el-popover
+              v-model:visible="scope.row.verifyVisible"
+              width="400"
+              placement="top"
+              trigger="hover"
+            >
+              <template #reference>
+                <el-icon class="verify-icon" @click.stop="scope.row.verifyVisible = true">
+                  <InfoFilled />
+                </el-icon>
+              </template>
+              <VerificationInfo :verification-data="scope.row.verificationData" />
+            </el-popover>
+          </div>
+          <span v-else>{{ statusMap[scope.row.status] || '-' }}</span>
         </template>
       </el-table-column>
       <el-table-column prop="notAfter" label="有效期限">
@@ -206,7 +219,9 @@
       :page-sizes="[10, 20, 50, 100]"
       @change="handlePageChange"
     />
+    <!-- 上传证书 -->
     <UploadCert v-model:visible="uploadCertificateVisible" @upLoadDone="upLoadDone" />
+    <!-- 编辑标签 -->
     <EditTags
       ref="editTagsRef"
       v-model:visible="editTagsVisible"
@@ -214,16 +229,19 @@
       :tableDataList="rowTableList"
       @confirmEditTags="confirmEditTags"
     />
+    <!-- 删除证书 -->
     <DeleteDialog v-model:visible="deleteDialogVisible" @confirmDelete="confirmDelete" />
   </ContentWrap>
 </template>
 <script setup lang="tsx">
 import { ContentWrap } from '@/components/ContentWrap'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import UploadCert from './components/UploadCert/index.vue'
 import TagInput from './components/TagInput/index.vue'
 import EditTags from './components/EditTags/index.vue'
 import DeleteDialog from './components/DeleteDialog/index.vue'
+import VerificationInfo from './components/VerificationInfo/index.vue'
 import { TableToolbar } from '@/components/TableToolbar'
 import { TableFilterPopover } from '@/components/TableFilterPopover'
 import { apiGetCertsList, apiDeleteCert, apiGetCertTotal, apiUpdateCert } from '@/api/certificate'
@@ -232,26 +250,41 @@ import { statusMap, statusOptions, statusImgMap } from './constants'
 import { Pagination } from '@/components/Pagination'
 import { ElMessage } from 'element-plus'
 import { useClipboard } from '@/hooks/web/useClipboard'
+import { InfoFilled } from '@element-plus/icons-vue'
+
+const router = useRouter()
 const uploadCertificateVisible = ref(false)
 const editTagsVisible = ref(false)
 const deleteDialogVisible = ref(false)
 const currentCertId = ref('')
-// 添加总记录数变量（模拟从 API 获取）
 const totalRecords = ref('0')
-const tagValid = ref(true)
 const tagInputRef = ref<InstanceType<typeof TagInput> | null>(null)
-const editTagsRef = ref<InstanceType<typeof EditTags> | null>(null)
+
 interface CertOption {
   status: string
   total: number
 }
-const certOptions = ref<CertOption[]>([])
 
+const certOptions = ref<CertOption[]>([])
 const currentStatus = ref('CERT_STATUS_ALL')
 const tagList = ref<string[]>([])
 const rowTableList = ref<any[]>([])
+interface ExtendedCertsList extends CertsList {
+  verifyVisible?: boolean
+  verificationData?: {
+    type: 'file' | 'dns'
+    domain: string
+    fileUrl?: string
+    fileContent?: string
+    recordType?: string
+    hostRecord?: string
+    recordValue?: string
+  } | null
+  editName?: string
+  visible?: boolean
+}
 
-const tableData = ref<CertsList[]>([])
+const tableData = ref<ExtendedCertsList[]>([])
 const queryParams = ref<CertsParams>({
   status: '',
   tags: [],
@@ -261,6 +294,15 @@ const queryParams = ref<CertsParams>({
   pageSize: 10
 })
 const loading = ref(false)
+
+const toolbarButtons = computed(() => [
+  {
+    key: 'apply',
+    label: '申请免费证书',
+    onClick: handleApplyCertificate
+  },
+  { key: 'upload', label: '上传证书', onClick: handleUploadCertificate }
+])
 onMounted(() => {
   getList()
   getCertTotalData()
@@ -272,7 +314,12 @@ const getList = async () => {
     const { data, code } = await apiGetCertsList(queryParams.value)
     loading.value = false
     if (code === 200) {
-      tableData.value = data.list
+      // 为验证中的证书添加验证信息弹窗控制
+      tableData.value = data.list.map((item) => ({
+        ...item,
+        verifyVisible: false,
+        verificationData: (item as any).verificationData || null
+      })) as ExtendedCertsList[]
       totalRecords.value = data.pagination.total
     }
   } catch {
@@ -307,11 +354,11 @@ const updateCertData = async (params: any) => {
   }
 }
 // 开启编辑证书名称
-const editCertName = (row) => {
+const editCertName = (row: ExtendedCertsList) => {
   row.editName = row.name
 }
 // 确认编辑证书名称
-const confirmEditName = (row) => {
+const confirmEditName = (row: ExtendedCertsList) => {
   if (row.editName) {
     updateCertData({ certId: row.id, name: row.editName, modifyTags: false })
     row.visible = false
@@ -328,9 +375,6 @@ const confirmEditTags = () => {
   updateCertData({ certId: rowTableList.value[0].id, modifyTags: true, tags: tagList.value })
   editTagsVisible.value = false
 }
-const onValidChange = (isValid: boolean) => {
-  tagValid.value = isValid
-}
 const handleTagSearch = async (callback?: (shouldClose?: boolean) => void) => {
   if (tagInputRef.value) {
     const valid = await tagInputRef.value.validate()
@@ -338,12 +382,10 @@ const handleTagSearch = async (callback?: (shouldClose?: boolean) => void) => {
     if (!valid) {
       return
     }
-    // 根据条件判断是否关闭
     if (callback) {
       callback(shouldClose)
     }
   }
-
   tableSearch()
 }
 // 更新分页参数的方法
@@ -352,7 +394,12 @@ const handlePageChange = (currentPage: number, pageSize: number) => {
   queryParams.value.pageSize = pageSize
   getList() // 刷新列表数据
 }
-// 修改按钮点击处理函数
+// 申请免费证书
+const handleApplyCertificate = () => {
+  router.push({ name: 'applyFreeCertificate' })
+}
+
+// 上传证书
 const handleUploadCertificate = () => {
   uploadCertificateVisible.value = true
 }
@@ -369,30 +416,28 @@ const confirmDelete = async () => {
   })
 }
 // 修改证书过滤状态
-const handleClickStatus = (status) => {
+const handleClickStatus = (status: string) => {
   if (currentStatus.value === status) return
   currentStatus.value = status
   queryParams.value.status = status === 'CERT_STATUS_ALL' ? '' : status
   getList()
 }
 
-const onSearch = (params) => {
+const onSearch = (params: Record<string, any>) => {
   queryParams.value = { ...queryParams.value, ...params }
-  console.log(queryParams.value, params)
   getList()
 }
+
 const tableSearch = () => {
-  console.log(queryParams.value)
   getList()
 }
-const onReset = (label, value) => {
-  console.log(label)
-  queryParams.value[label] = value
+
+const onReset = (label: string, value: any) => {
+  ;(queryParams.value as any)[label] = value
   tableSearch()
-  getList()
 }
+
 const onRefresh = () => {
-  console.log(queryParams.value)
   getList()
 }
 
@@ -418,8 +463,6 @@ const handleCopyDomains = (domains: string[]) => {
   }
 
   copy(domainsText)
-
-  // 使用 setTimeout 等待 copied 状态更新
   setTimeout(() => {
     if (copied.value) {
       ElMessage.success('复制成功')
@@ -428,26 +471,6 @@ const handleCopyDomains = (domains: string[]) => {
 }
 </script>
 <style lang="less" scoped>
-.el-radio {
-  width: 100%;
-  display: block;
-}
-.radio-group-bottom {
-  display: flex;
-  justify-content: space-between;
-  border-top: solid 1px #eaedf1;
-}
-.el-button {
-  margin-top: 10px;
-}
-.table-filter-container {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  .cursor-pointer {
-    cursor: pointer;
-  }
-}
 .page-title {
   font-size: 18px;
   line-height: 26px;
@@ -455,48 +478,76 @@ const handleCopyDomains = (domains: string[]) => {
   margin-bottom: 20px;
   text-align: left;
 }
-.bottom-10 {
-  margin-bottom: 10px;
-}
-.ul-continer {
+
+.status-container {
   display: flex;
   justify-content: space-around;
   margin: 20px 0;
+  padding: 0;
+  list-style: none;
+
   li {
-    width: 20%;
     display: flex;
     flex-direction: column;
-    -moz-box-align: center;
+    align-items: center;
     cursor: pointer;
-    padding: 12px 16px;
-    margin: 0 10px;
     flex: 1 1 0%;
     height: 92px;
     margin-right: 12px;
     padding: 16px;
-    background: rgb(246, 247, 251);
-    border: 1px solid rgb(229, 232, 239);
-    border-radius: 8px 8px 0px 0px;
+    background: #f6f7fb;
+    border: 1px solid #e5e8ef;
+    border-radius: 8px 8px 0 0;
+
+    &:last-child {
+      margin-right: 0;
+    }
+
     img {
       width: 12px;
       margin-right: 4px;
       vertical-align: middle;
     }
+
     span {
-      color: rgb(66, 70, 78);
+      color: #42464e;
       font-size: 12px;
     }
+
     p {
       margin-top: 4px;
       font-weight: bold;
       font-size: 28px;
       line-height: 28px;
     }
+
+    &.active {
+      border-top: 4px solid #1664ff;
+      background: #ffffff;
+      border-bottom: none;
+    }
   }
-  .active {
-    border-top: 4px solid rgb(22, 100, 255);
-    background: rgb(255, 255, 255);
-    border-bottom: none;
+}
+
+.table-filter-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.status-verifying {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  .verify-icon {
+    cursor: pointer;
+    color: #409eff;
+    font-size: 14px;
+
+    &:hover {
+      color: #66b1ff;
+    }
   }
 }
 
@@ -505,20 +556,25 @@ const handleCopyDomains = (domains: string[]) => {
   cursor: pointer;
   margin-left: 5px;
 }
-.el-table__cell .el-icon {
-  vertical-align: middle;
-  margin-top: -4px;
-}
-.el-table__cell:hover .edit-icon {
-  display: inline-block; /* 鼠标浮动时显示 */
+
+:deep(.el-table__cell) {
+  .el-icon {
+    vertical-align: middle;
+    margin-top: -4px;
+  }
+
+  &:hover .edit-icon {
+    display: inline-block;
+  }
 }
 
-// 域名列表样式
 .domain-empty {
   color: #909399;
 }
 
 .domain-list-container {
+  display: flex;
+  flex-wrap: wrap;
   gap: 8px;
 }
 
@@ -568,6 +624,7 @@ const handleCopyDomains = (domains: string[]) => {
   margin-bottom: 10px;
   text-align: left;
 }
+
 .domain-list {
   display: block;
   margin-bottom: 3px;
