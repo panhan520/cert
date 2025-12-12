@@ -22,14 +22,14 @@
           <li>
             <span class="label">待添加文件：</span>
             <span class="value file-url">{{ verificationData.fileUrl }}</span>
-            <el-icon class="copy-icon" @click="handleCopy(verificationData.fileUrl)">
+            <el-icon class="copy-icon" @click="handleCopy(verificationData.fileUrl || '')">
               <DocumentCopy />
             </el-icon>
           </li>
           <li>
             <span class="label">文件内容：</span>
             <span class="value file-content">{{ verificationData.fileContent }}</span>
-            <el-icon class="copy-icon" @click="handleCopy(verificationData.fileContent)">
+            <el-icon class="copy-icon" @click="handleCopy(verificationData.fileContent || '')">
               <DocumentCopy />
             </el-icon>
           </li>
@@ -65,7 +65,7 @@
           <li>
             <span class="label">记录值：</span>
             <span class="value record-value">{{ verificationData.recordValue }}</span>
-            <el-icon class="copy-icon" @click="handleCopy(verificationData.recordValue)">
+            <el-icon class="copy-icon" @click="handleCopy(verificationData.recordValue || '')">
               <DocumentCopy />
             </el-icon>
           </li>
@@ -77,7 +77,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { InfoFilled, DocumentCopy } from '@element-plus/icons-vue'
 import { useClipboard } from '@/hooks/web/useClipboard'

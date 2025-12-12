@@ -245,7 +245,7 @@ import VerificationInfo from './components/VerificationInfo/index.vue'
 import { TableToolbar } from '@/components/TableToolbar'
 import { TableFilterPopover } from '@/components/TableFilterPopover'
 import { apiGetCertsList, apiDeleteCert, apiGetCertTotal, apiUpdateCert } from '@/api/certificate'
-import { CertsList, CertsParams } from '@/api/certificate/type'
+import { ExtendedCertsList, CertsParams } from '@/api/certificate/type'
 import { statusMap, statusOptions, statusImgMap } from './constants'
 import { Pagination } from '@/components/Pagination'
 import { ElMessage } from 'element-plus'
@@ -269,20 +269,6 @@ const certOptions = ref<CertOption[]>([])
 const currentStatus = ref('CERT_STATUS_ALL')
 const tagList = ref<string[]>([])
 const rowTableList = ref<any[]>([])
-interface ExtendedCertsList extends CertsList {
-  verifyVisible?: boolean
-  verificationData?: {
-    type: 'file' | 'dns'
-    domain: string
-    fileUrl?: string
-    fileContent?: string
-    recordType?: string
-    hostRecord?: string
-    recordValue?: string
-  } | null
-  editName?: string
-  visible?: boolean
-}
 
 const tableData = ref<ExtendedCertsList[]>([])
 const queryParams = ref<CertsParams>({

@@ -37,3 +37,18 @@ export interface CreateCertificate {
 export interface DeleteCertificate {
   certId: string
 }
+
+export interface ExtendedCertsList extends CertsList {
+  verifyVisible?: boolean
+  verificationData?: {
+    type: 'file' | 'dns'
+    domain: string
+    fileUrl?: string
+    fileContent?: string
+    recordType?: string
+    hostRecord?: string
+    recordValue?: string
+  } | null
+  editName?: string
+  visible?: boolean
+}
