@@ -175,8 +175,7 @@
           </div>
         </template>
         <template #default="scope">
-          <div v-if="scope.row.status === 'CERT_STATUS_VERIFYING'" class="status-verifying">
-            <span>{{ statusMap[scope.row.status] || '-' }}</span>
+          <div v-if="scope.row.status === 'CERT_STATUS_ISSUE'">
             <el-popover
               v-model:visible="scope.row.verifyVisible"
               width="400"
@@ -184,9 +183,7 @@
               trigger="hover"
             >
               <template #reference>
-                <el-icon class="verify-icon" @click.stop="scope.row.verifyVisible = true">
-                  <InfoFilled />
-                </el-icon>
+                <span>{{ statusMap[scope.row.status] || '-' }}</span>
               </template>
               <VerificationInfo :verification-data="scope.row.verificationData" />
             </el-popover>
@@ -208,7 +205,12 @@
       </el-table-column>
       <el-table-column label="操作">
         <template #default="scope">
-          <span @click="handleDelete(scope.row.id)" class="button-text">删除</span>
+          <div class="button-group">
+            <span v-if="scope.row.status === 'CERT_STATUS_EXPIRES_SOON'" class="button-text"
+              >续期</span
+            >
+            <span @click="handleDelete(scope.row.id)" class="button-text">删除</span>
+          </div>
         </template>
       </el-table-column>
     </el-table>
@@ -250,7 +252,6 @@ import { statusMap, statusOptions, statusImgMap } from './constants'
 import { Pagination } from '@/components/Pagination'
 import { ElMessage } from 'element-plus'
 import { useClipboard } from '@/hooks/web/useClipboard'
-import { InfoFilled } from '@element-plus/icons-vue'
 
 const router = useRouter()
 const uploadCertificateVisible = ref(false)
@@ -300,6 +301,7 @@ const getList = async () => {
     const { data, code } = await apiGetCertsList(queryParams.value)
     loading.value = false
     if (code === 200) {
+      // data.list[0] = { ...data.list[0], verificationData: { type: 'file' } }
       // 为验证中的证书添加验证信息弹窗控制
       tableData.value = data.list.map((item) => ({
         ...item,
@@ -457,6 +459,26 @@ const handleCopyDomains = (domains: string[]) => {
 }
 </script>
 <style lang="less" scoped>
+.el-radio {
+  width: 100%;
+  display: block;
+}
+.radio-group-bottom {
+  display: flex;
+  justify-content: space-between;
+  border-top: solid 1px #eaedf1;
+}
+.el-button {
+  margin-top: 10px;
+}
+.table-filter-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  .cursor-pointer {
+    cursor: pointer;
+  }
+}
 .page-title {
   font-size: 18px;
   line-height: 26px;
@@ -469,8 +491,6 @@ const handleCopyDomains = (domains: string[]) => {
   display: flex;
   justify-content: space-around;
   margin: 20px 0;
-  padding: 0;
-  list-style: none;
 
   li {
     display: flex;
@@ -515,28 +535,6 @@ const handleCopyDomains = (domains: string[]) => {
   }
 }
 
-.table-filter-container {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.status-verifying {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-
-  .verify-icon {
-    cursor: pointer;
-    color: #409eff;
-    font-size: 14px;
-
-    &:hover {
-      color: #66b1ff;
-    }
-  }
-}
-
 .edit-icon {
   display: none;
   cursor: pointer;
@@ -559,8 +557,6 @@ const handleCopyDomains = (domains: string[]) => {
 }
 
 .domain-list-container {
-  display: flex;
-  flex-wrap: wrap;
   gap: 8px;
 }
 
@@ -591,6 +587,10 @@ const handleCopyDomains = (domains: string[]) => {
   &:hover {
     background: #e4e7ed;
   }
+}
+.button-group {
+  display: flex;
+  gap: 5px;
 }
 </style>
 

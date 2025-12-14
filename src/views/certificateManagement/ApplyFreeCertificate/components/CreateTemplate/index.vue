@@ -42,12 +42,19 @@
           />
         </el-form-item>
 
-        <el-form-item label="联系人姓名" prop="contactName" required>
-          <div class="name-inputs">
+        <div class="name-inputs">
+          <el-form-item label="联系人姓氏" prop="surname" required class="name-input-item">
             <el-input v-model="formData.surname" placeholder="姓" clearable :max-length="50" />
+          </el-form-item>
+          <el-form-item
+            label="联系人名字"
+            prop="givenName"
+            required
+            class="name-input-item last-name"
+          >
             <el-input v-model="formData.givenName" placeholder="名" clearable :max-length="50" />
-          </div>
-        </el-form-item>
+          </el-form-item>
+        </div>
 
         <el-form-item label="联系人邮箱" prop="contactEmail" required>
           <el-input v-model="formData.contactEmail" placeholder="请输入邮箱" clearable />
@@ -207,7 +214,7 @@ const formData = reactive({
   tags: [] as string[]
 })
 
-const countryOptions = computed(() => getCountryOptions())
+const countryOptions = computed(() => getCountryOptions('zh-CN'))
 
 const rules: FormRules = {
   name: [{ required: true, message: '请输入模板名称', trigger: 'blur' }],
@@ -407,8 +414,19 @@ watch(
       width: 100%;
       display: flex;
       gap: 12px;
-      .el-input {
-        flex: 1;
+
+      .name-input-item {
+        :deep(.el-form-item__content) {
+          width: 100%;
+        }
+        :deep(.el-input) {
+          width: 358px;
+        }
+      }
+      .last-name {
+        :deep(.el-form-item__label) {
+          display: none;
+        }
       }
     }
   }

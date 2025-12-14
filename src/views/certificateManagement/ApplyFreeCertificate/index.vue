@@ -122,7 +122,14 @@ const formData = reactive({
   tags: [] as string[]
 })
 const rules: FormRules = {
-  domain: [{ required: true, message: '请输入域名', trigger: 'blur' }],
+  domain: [
+    { required: true, message: '请输入域名', trigger: 'blur' },
+    {
+      pattern: /^(?!-)(?:[a-zA-Z0-9-]{1,63}\.)+[a-zA-Z]{2,63}$/,
+      message: '请输入合法的域名',
+      trigger: ['blur']
+    }
+  ],
   templateId: [{ required: true, message: '请选择信息模板', trigger: 'change' }],
   remarkName: [{ required: true, message: '请输入备注名称', trigger: 'blur' }]
 }
