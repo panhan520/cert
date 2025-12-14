@@ -61,15 +61,6 @@ export const asyncRouterMap: AppRouteRecordRaw[] = [
           title: '证书管理',
           icon: 'vi-clarity:document-solid'
         }
-      },
-      {
-        path: 'apply',
-        component: () => import('@/views/certificateManagement/ApplyFreeCertificate/index.vue'),
-        name: 'applyFreeCertificate',
-        meta: {
-          title: '申请免费证书',
-          hidden: true
-        }
       }
     ]
   }

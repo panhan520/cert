@@ -137,9 +137,6 @@ const updateTag = (val: string, index: number) => {
       width: 230px;
       margin-right: 10px;
     }
-    :deep(.el-form-item) {
-      margin-bottom: 0 !important;
-    }
   }
 }
 .add-tag {
