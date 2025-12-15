@@ -74,7 +74,7 @@
                 :key="`${scope.row.id}-${index}`"
                 class="domain-item"
               >
-                <el-tooltip class="box-item" placement="top" effect="light" :content="item">
+                <el-tooltip class="box-item" placement="top" :content="item">
                   <el-tag type="info" class="domain-tag">{{ truncateText(item) }}</el-tag>
                 </el-tooltip>
               </div>
@@ -99,7 +99,7 @@
                     class="domain-list"
                   >
                     <div class="domain-popover-item">
-                      <el-tooltip class="box-item" placement="top" effect="light" :content="item">
+                      <el-tooltip class="box-item" placement="top" :content="item">
                         <span class="domain-popover-text">{{ item }}</span>
                       </el-tooltip>
                     </div>
@@ -143,13 +143,12 @@
             v-if="scope.row.tags.length === 0"
             class="box-item"
             placement="top"
-            effect="light"
             content="暂无标签"
           >
             {{ scope.row.tags.length }}
           </el-tooltip>
           <span v-else>{{ scope.row.tags.length }}</span>
-          <el-tooltip class="box-item" placement="top" effect="light" content="编辑">
+          <el-tooltip class="box-item" placement="top" content="编辑">
             <el-icon class="edit-icon" @click="handleEditTags(scope.row)">
               <EditPen />
             </el-icon>

@@ -134,9 +134,8 @@
               <el-tooltip
                 content="支持通过标签标记资源，从不同维度实现云资源分类与聚合。"
                 placement="top"
-                effect="light"
               >
-                <el-icon><QuestionFilled /></el-icon>
+                <el-icon class="question-icon"><QuestionFilled /></el-icon>
               </el-tooltip>
             </span>
           </template>
@@ -158,9 +157,8 @@
               <el-tooltip
                 content="证书完整性校验是指证书中心会检查您上传的证书链是否完整并向上补齐、检查证书的上下级签发关系是否成立以及是否采用了不安全的摘要算法，以保证您上传证书的可用性。"
                 placement="top"
-                effect="light"
               >
-                <el-icon><QuestionFilled /></el-icon>
+                <el-icon class="question-icon"><QuestionFilled /></el-icon>
               </el-tooltip>
             </span>
           </template>

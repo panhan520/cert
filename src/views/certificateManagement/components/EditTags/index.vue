@@ -11,11 +11,7 @@
     <Table :columns="columns" :data="tableDataList" />
     <div class="title-container"
       >标签
-      <el-tooltip
-        content="支持通过标签标记资源，从不同维度实现云资源分类与聚合。"
-        placement="top"
-        effect="light"
-      >
+      <el-tooltip content="支持通过标签标记资源，从不同维度实现云资源分类与聚合。" placement="top">
         <el-icon><QuestionFilled /></el-icon>
       </el-tooltip>
     </div>

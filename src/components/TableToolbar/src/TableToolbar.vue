@@ -42,7 +42,7 @@
         @keyup.enter="handleSearch"
         style="width: 200px; margin-left: 8px"
       /> -->
-      <el-tooltip content="刷新" placement="top" effect="light">
+      <el-tooltip content="刷新" placement="top">
         <el-button @click="handleRefresh" class="refresh-btn"
           ><el-icon :size="16"><RefreshRight /></el-icon
         ></el-button>
