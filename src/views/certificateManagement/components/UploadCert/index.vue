@@ -24,26 +24,21 @@
       <el-form label-width="160px" :model="ruleForm" :rules="rules" ref="ruleFormRef">
         <!-- 证书标准 -->
         <el-form-item label="证书标准" prop="standards">
-          <el-radio-group v-model="ruleForm.standards" text-color="#1664ff" fill="#f4f7ff">
+          <el-radio-group v-model="ruleForm.standards">
             <el-radio-button border label="gj">国际标准</el-radio-button>
           </el-radio-group>
         </el-form-item>
 
         <!-- 密钥算法 -->
         <el-form-item label="密钥算法" prop="algorithm">
-          <el-radio-group v-model="ruleForm.algorithm" text-color="#1664ff" fill="#f4f7ff">
+          <el-radio-group v-model="ruleForm.algorithm">
             <el-radio-button border label="rsa">RSA / ECC 算法</el-radio-button>
           </el-radio-group>
         </el-form-item>
 
         <!-- 上传方式 -->
         <el-form-item label="上传方式" prop="mode">
-          <el-radio-group
-            v-model="ruleForm.mode"
-            text-color="#1664ff"
-            fill="#f4f7ff"
-            @click="resetForm(ruleFormRef)"
-          >
+          <el-radio-group v-model="ruleForm.mode" @click="resetForm(ruleFormRef)">
             <el-radio-button border label="input">手动输入</el-radio-button>
             <el-radio-button border label="file">文件上传</el-radio-button>
           </el-radio-group>

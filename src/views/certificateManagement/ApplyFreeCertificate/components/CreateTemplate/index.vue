@@ -21,12 +21,7 @@
           <span>基本信息</span>
         </div>
         <el-form-item label="模板持有者类型" prop="holderType" required>
-          <el-radio-group
-            v-model="formData.holderType"
-            @change="handleHolderTypeChange"
-            text-color="#1664ff"
-            fill="#f4f7ff"
-          >
+          <el-radio-group v-model="formData.holderType" @change="handleHolderTypeChange">
             <el-radio-button label="individual">个人</el-radio-button>
             <el-radio-button label="enterprise">企业</el-radio-button>
           </el-radio-group>

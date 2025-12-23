@@ -243,7 +243,7 @@ import TagInput from './components/TagInput/index.vue'
 import EditTags from './components/EditTags/index.vue'
 import DeleteDialog from './components/DeleteDialog/index.vue'
 import VerificationInfo from './components/VerificationInfo/index.vue'
-import { TableToolbar } from '@/components/TableToolbar'
+import { TableToolbar } from '@/components/TableToolbarCert'
 import { TableFilterPopover } from '@/components/TableFilterPopover'
 import { apiGetCertsList, apiDeleteCert, apiGetCertTotal, apiUpdateCert } from '@/api/certificate'
 import { ExtendedCertsList, CertsParams } from '@/api/certificate/type'
@@ -257,7 +257,7 @@ const uploadCertificateVisible = ref(false)
 const editTagsVisible = ref(false)
 const deleteDialogVisible = ref(false)
 const currentCertId = ref('')
-const totalRecords = ref('0')
+const totalRecords = ref(0)
 const tagInputRef = ref<InstanceType<typeof TagInput> | null>(null)
 
 interface CertOption {

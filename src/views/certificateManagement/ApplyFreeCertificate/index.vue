@@ -21,42 +21,43 @@
             <span>证书信息</span>
           </div>
           <el-form-item label="证书标准" prop="standard" required>
-            <el-radio-group v-model="formData.standard" text-color="#1664ff" fill="#f4f7ff">
-              <el-radio-button label="international">国际标准</el-radio-button>
+            <el-radio-group v-model="formData.standard">
+              <el-radio label="international">国际标准</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item label="证书服务时长" prop="duration" required>
-            <el-radio-group v-model="formData.duration" text-color="#1664ff" fill="#f4f7ff">
-              <el-radio-button label="3months">3个月</el-radio-button>
+            <el-radio-group v-model="formData.duration">
+              <el-radio label="3months">3个月</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item label="CSR生成方式" prop="csrMethod" required>
-            <el-radio-group v-model="formData.csrMethod" text-color="#1664ff" fill="#f4f7ff">
-              <el-radio-button label="auto">自动</el-radio-button>
+            <el-radio-group v-model="formData.csrMethod">
+              <el-radio label="auto">自动</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item label="密钥算法" prop="algorithm" required>
-            <el-radio-group v-model="formData.algorithm" text-color="#1664ff" fill="#f4f7ff">
-              <el-radio-button label="rsa">
-                RSA
-                <el-tag type="danger" size="small" class="recommend-tag">荐</el-tag>
-              </el-radio-button>
-              <el-radio-button label="ecc">ECC</el-radio-button>
+            <el-radio-group v-model="formData.algorithm">
+              <el-radio label="rsa"> RSA（推荐） </el-radio>
+              <el-radio label="ecc">ECC</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item label="域名(CN)" prop="domain" required>
-            <el-input v-model="formData.domain" clearable class="form-item-input" />
-            <div class="verify-tips">请输入单域名,例如: volcengine.com、a.volcengine.com</div>
+            <el-input
+              v-model="formData.domain"
+              clearable
+              class="form-item-input"
+              placeholder="请输入单域名,例如: volcengine.com、a.volcengine.com"
+            />
           </el-form-item>
           <el-form-item label="选择信息模板" prop="templateId" required>
             <TemplateSelector v-model="formData.templateId" />
           </el-form-item>
           <el-form-item label="域名验证方式" prop="verifyMethod" required>
-            <el-radio-group v-model="formData.verifyMethod" text-color="#1664ff" fill="#f4f7ff">
+            <el-radio-group v-model="formData.verifyMethod">
               <el-radio-button label="dns">DNS验证</el-radio-button>
               <el-radio-button label="file">文件验证</el-radio-button>
             </el-radio-group>
-            <div class="verify-tips">
+            <div class="verify-tips" v-if="formData.verifyMethod === 'dns'">
               当您的域名解析托管在 TrafficRoute 时，我们将帮助您自动完成 DNS 验证
             </div>
           </el-form-item>
@@ -205,16 +206,6 @@ const handleBack = () => {
     .question-icon {
       vertical-align: middle;
       margin-top: -2px;
-    }
-    .recommend-tag {
-      margin-left: 4px;
-      vertical-align: middle;
-      position: absolute;
-      right: 0px;
-      top: -10px;
-      border-radius: 8px 3px 8px 3px;
-      background: #f56c6c;
-      color: #ffffff;
     }
     .verify-tips {
       width: 100%;

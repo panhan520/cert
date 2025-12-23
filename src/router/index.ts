@@ -72,6 +72,23 @@ export const asyncRouterMap: AppRouteRecordRaw[] = [
         }
       }
     ]
+  },
+  {
+    path: '/templateManagement',
+    component: Layout,
+    name: 'TemplateManagement',
+    meta: {},
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/template/index.vue'),
+        name: 'TemplateManagementList',
+        meta: {
+          title: '模版管理',
+          icon: 'vi-clarity:document-solid'
+        }
+      }
+    ]
   }
   // {
   //   path: '/authorization',
