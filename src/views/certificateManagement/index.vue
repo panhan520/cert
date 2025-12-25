@@ -159,7 +159,7 @@
             <TableFilterPopover
               placement="top-start"
               :width="180"
-              @search="tableSearch"
+              @search="getList"
               :isFilter="!!queryParams.status"
               @reset="onReset('status', '')"
             >
@@ -228,6 +228,7 @@
       v-model:visible="editTagsVisible"
       v-model:tags="tagList"
       :tableDataList="rowTableList"
+      :columns="tagsColumns"
       @confirmEditTags="confirmEditTags"
     />
     <!-- 删除证书 -->
@@ -236,7 +237,7 @@
 </template>
 <script setup lang="tsx">
 import { ContentWrap } from '@/components/ContentWrap'
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, ref, computed, h } from 'vue'
 import { useRouter } from 'vue-router'
 import UploadCert from './components/UploadCert/index.vue'
 import TagInput from './components/TagInput/index.vue'
@@ -251,6 +252,8 @@ import { statusMap, statusOptions, statusImgMap } from './constants'
 import { Pagination } from '@/components/Pagination'
 import { ElMessage } from 'element-plus'
 import { useClipboard } from '@/hooks/web/useClipboard'
+import { TableColumn } from '@/components/Table'
+import { ElTooltip, ElTag } from 'element-plus'
 
 const router = useRouter()
 const uploadCertificateVisible = ref(false)
@@ -289,6 +292,53 @@ const toolbarButtons = computed(() => [
   },
   { key: 'upload', label: '上传证书', onClick: handleUploadCertificate }
 ])
+
+const tagsColumns: TableColumn[] = [
+  {
+    field: 'subjectNames',
+    label: '绑定域名',
+    slots: {
+      default: ({ row }) => {
+        const names: string[] = Array.isArray(row.subjectNames) ? row.subjectNames : []
+
+        return h(
+          'div',
+          { class: 'subject-list' },
+          names.map((item, idx) =>
+            // 外层包一个块级 div，并且给 key，防止 Vue 复用组件实例
+            h(
+              'div',
+              {
+                key: `${item}-${idx}`,
+                style: {
+                  display: 'block', // 每个 item 换行
+                  marginBottom: '8px' // 间距（按需调整）
+                }
+              },
+              [
+                h(
+                  ElTooltip,
+                  {
+                    content: item,
+                    placement: 'top',
+                    effect: 'light'
+                  },
+                  {
+                    default: () => h(ElTag, { type: 'info', class: 'bottom-10' }, () => item)
+                  }
+                )
+              ]
+            )
+          )
+        )
+      }
+    }
+  },
+  {
+    field: 'id',
+    label: 'ID'
+  }
+]
 onMounted(() => {
   getList()
   getCertTotalData()
@@ -373,7 +423,7 @@ const handleTagSearch = async (callback?: (shouldClose?: boolean) => void) => {
       callback(shouldClose)
     }
   }
-  tableSearch()
+  getList()
 }
 // 更新分页参数的方法
 const handlePageChange = (currentPage: number, pageSize: number) => {
@@ -415,13 +465,9 @@ const onSearch = (params: Record<string, any>) => {
   getList()
 }
 
-const tableSearch = () => {
-  getList()
-}
-
 const onReset = (label: string, value: any) => {
   ;(queryParams.value as any)[label] = value
-  tableSearch()
+  getList()
 }
 
 const onRefresh = () => {
@@ -469,14 +515,6 @@ const handleCopyDomains = (domains: string[]) => {
 }
 .el-button {
   margin-top: 10px;
-}
-.table-filter-container {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  .cursor-pointer {
-    cursor: pointer;
-  }
 }
 .page-title {
   font-size: 18px;
@@ -543,7 +581,7 @@ const handleCopyDomains = (domains: string[]) => {
 :deep(.el-table__cell) {
   .el-icon {
     vertical-align: middle;
-    margin-top: -4px;
+    margin-top: -2px;
   }
 
   &:hover .edit-icon {

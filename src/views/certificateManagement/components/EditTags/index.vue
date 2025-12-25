@@ -2,7 +2,7 @@
   <el-dialog
     v-model="visible"
     width="600"
-    :style="{ height: '70vh', overflow: 'auto' }"
+    :style="{ height: '50vh', overflow: 'auto' }"
     :with-header="true"
     class="upload-certificate"
     title="编辑标签"
@@ -12,7 +12,7 @@
     <div class="title-container"
       >标签
       <el-tooltip content="支持通过标签标记资源，从不同维度实现云资源分类与聚合。" placement="top">
-        <el-icon><QuestionFilled /></el-icon>
+        <el-icon class="question-icon"><QuestionFilled /></el-icon>
       </el-tooltip>
     </div>
     <TagInput v-model="tags" ref="tagInputRef" />
@@ -25,8 +25,8 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { computed, h, ref } from 'vue'
-import { ElTooltip, ElTag } from 'element-plus'
+import { computed, ref } from 'vue'
+import { ElTooltip } from 'element-plus'
 
 import { Table, TableColumn } from '@/components/Table'
 import TagInput from '../TagInput/index.vue'
@@ -42,6 +42,10 @@ const props = defineProps({
   tableDataList: {
     type: Array<any>,
     default: () => []
+  },
+  columns: {
+    type: Array<TableColumn>,
+    default: () => []
   }
 })
 const tagInputRef = ref<InstanceType<typeof TagInput> | null>(null)
@@ -55,53 +59,8 @@ const tags = computed({
   get: () => props.tags,
   set: (val) => emit('update:tags', val)
 })
-const columns: TableColumn[] = [
-  {
-    field: 'subjectNames',
-    label: '绑定域名',
-    slots: {
-      default: ({ row }) => {
-        const names: string[] = Array.isArray(row.subjectNames) ? row.subjectNames : []
-
-        return h(
-          'div',
-          { class: 'subject-list' },
-          names.map((item, idx) =>
-            // 外层包一个块级 div，并且给 key，防止 Vue 复用组件实例
-            h(
-              'div',
-              {
-                key: `${item}-${idx}`,
-                style: {
-                  display: 'block', // 每个 item 换行
-                  marginBottom: '8px' // 间距（按需调整）
-                }
-              },
-              [
-                h(
-                  ElTooltip,
-                  {
-                    content: item,
-                    placement: 'top',
-                    effect: 'light'
-                  },
-                  {
-                    default: () => h(ElTag, { type: 'info', class: 'bottom-10' }, () => item)
-                  }
-                )
-              ]
-            )
-          )
-        )
-      }
-    }
-  },
-  {
-    field: 'id',
-    label: 'ID'
-  }
-]
 const handleCancel = () => {
+  console.log(props.columns)
   visible.value = false
 }
 const submitForm = async () => {

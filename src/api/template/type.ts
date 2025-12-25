@@ -10,6 +10,7 @@ export interface TemplateRecord {
   remark?: string
   hosts?: HostItem[]
   parameters?: ParameterItem[]
+  tags?: string[]
 }
 
 export interface ParameterItem {

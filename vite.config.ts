@@ -142,6 +142,10 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
         '/apis': {
           target: 'https://www.dev.wafscloud.com',
           changeOrigin: true
+        },
+        '/api/v1': {
+          target: 'https://gateway.observe.dev.eks.gainetics.io/aomp',
+          changeOrigin: true
         }
       },
       hmr: {

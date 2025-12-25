@@ -401,9 +401,9 @@ watch(
       margin-top: -2px;
     }
     .verify-tips {
-      width: 100%;
       font-size: 12px;
       color: #909399;
+      margin-left: 10px;
     }
     .name-inputs {
       width: 100%;

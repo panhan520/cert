@@ -108,6 +108,7 @@
     v-model:visible="editTagsVisible"
     v-model:tags="tagList"
     :tableDataList="rowTableList"
+    :columns="tagsColumns"
     @confirmEditTags="confirmEditTags"
   />
   <!-- 新建模板弹框 -->
@@ -122,6 +123,7 @@ import TagInput from '@/views/certificateManagement/components/TagInput/index.vu
 import { Pagination } from '@/components/Pagination'
 import EditTags from '@/views/certificateManagement/components/EditTags/index.vue'
 import CreateTemplate from '../CreateTemplate/index.vue'
+import { TableColumn } from '@/components/Table'
 
 interface TemplateItem {
   id: string
@@ -165,7 +167,16 @@ const rowTableList = ref<any[]>([])
 const editTagsVisible = ref(false)
 // 新建模版相关
 const createTemplateVisible = ref(false)
-
+const tagsColumns: TableColumn[] = [
+  {
+    field: 'type',
+    label: '模版持有者类型'
+  },
+  {
+    field: 'name',
+    label: '模版名称'
+  }
+]
 watch(selectedId, (val) => {
   emit('update:modelValue', val)
 })
@@ -319,7 +330,7 @@ onMounted(() => {
     :deep(.el-table__cell) {
       .el-icon {
         vertical-align: middle;
-        margin-top: -4px;
+        margin-top: -2px;
       }
       &:hover .edit-icon {
         display: inline-block;

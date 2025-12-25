@@ -48,6 +48,20 @@
           >
             <span>{{ filter.label }}</span>
           </el-button>
+          <!-- 按钮组筛选项 -->
+          <el-radio-group
+            v-else-if="filter.type === 'radio'"
+            v-model="filterValuesState[filter.key]"
+            @change="emitImmediateSearch"
+          >
+            <el-radio-button
+              v-for="option in filter.options || []"
+              :key="option.value"
+              :label="option.value"
+            >
+              {{ option.label }}
+            </el-radio-button>
+          </el-radio-group>
           <component
             :is="filter.render"
             v-else
@@ -177,7 +191,7 @@ export interface ToolbarFilterOption {
 
 export interface ToolbarFilter {
   key: string
-  type?: 'input' | 'select' | 'text' | 'button'
+  type?: 'input' | 'select' | 'text' | 'button' | 'radio'
   placeholder?: string
   width?: number | string
   clearable?: boolean
