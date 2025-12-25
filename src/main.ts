@@ -40,6 +40,7 @@ import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import './permission'
 import { useUserStore } from '@/store/modules/user'
 import '@fortawesome/fontawesome-free/css/all.css'
+import 'material-symbols/outlined.css'
 let app: any = null
 
 // qiankun props 全局存储

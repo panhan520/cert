@@ -12,7 +12,8 @@
           <el-icon><WarningFilled /></el-icon>
         </div>
         <div class="description">
-          <slot name="description"> {{ description }} </slot>
+          <span> {{ description }} </span>
+          <span class="description-tips"> {{ descriptionTips }} </span>
         </div>
       </div>
     </div>
@@ -36,12 +37,14 @@ const props = withDefaults(
     visible: boolean
     title?: string
     description?: string
+    descriptionTips?: string
     confirmButtonText?: string
     loading?: boolean
   }>(),
   {
     title: '删除确认',
     description: '删除后将无法恢复，请谨慎操作。',
+    descriptionTips: '',
     confirmButtonText: '删除',
     loading: false
   }
@@ -102,6 +105,12 @@ const handleConfirm = () => {
       line-height: 22px;
       font-size: 14px;
       flex: 1;
+      .description-tips {
+        display: block;
+        font-size: 12px;
+        color: #86909c;
+        margin-top: 3px;
+      }
     }
   }
 

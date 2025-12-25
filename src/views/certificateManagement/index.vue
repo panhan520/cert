@@ -187,7 +187,10 @@
               <VerificationInfo :verification-data="scope.row.verificationData" />
             </el-popover>
           </div>
-          <span v-else>{{ statusMap[scope.row.status] || '-' }}</span>
+          <span v-else>
+            <span class="material-symbols-outlined"> clock_loader_80 </span
+            >{{ statusMap[scope.row.status] || '-' }}</span
+          >
         </template>
       </el-table-column>
       <el-table-column prop="notAfter" label="有效期限">

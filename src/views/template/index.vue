@@ -88,6 +88,7 @@
         </template>
       </template>
     </ManagementList>
+
     <!-- 新建模板弹框 -->
     <CreateTemplate v-model:visible="createTemplateVisible" @confirm="handleTemplateCreated" />
     <!-- 查看详情抽屉 -->
@@ -109,7 +110,8 @@
     <DeleteConfirmDialog
       v-model:visible="deleteDialog.visible"
       title="删除模版"
-      :description="`将删除【${deleteDialog.target?.name}】,删除后该模版将被清除且无法被引用，请谨慎操作。`"
+      :description="`将删除模板【${deleteDialog.target?.name}】，此操作不可逆，删除后模板数据将永久清除，无法恢复。请谨慎操作`"
+      descriptionTips="该模板关联的证书配置不会受影响，仅模板本身被移除"
       :loading="deleteDialog.loading"
       @confirm="confirmDeleteTemplate"
       @cancel="handleDeleteCancel"
