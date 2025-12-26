@@ -152,7 +152,7 @@
           </el-tooltip>
         </template>
       </el-table-column>
-      <el-table-column prop="status" label="状态">
+      <el-table-column prop="status" label="状态" min-width="100">
         <template #header>
           <div class="table-filter-container">
             <span>状态</span>
@@ -174,7 +174,7 @@
           </div>
         </template>
         <template #default="scope">
-          <div v-if="scope.row.status === 'CERT_STATUS_ISSUE'">
+          <div v-if="scope.row.status === 'CERT_STATUS_VALIDATING'">
             <el-popover
               v-model:visible="scope.row.verifyVisible"
               width="400"
@@ -182,15 +182,20 @@
               trigger="hover"
             >
               <template #reference>
-                <span>{{ statusMap[scope.row.status] || '-' }}</span>
+                <el-tag :type="statusTagsMap[scope.row.status]" effect="light" round>
+                  <span class="material-symbols-outlined tags-icon"
+                    >{{ statusIconMap[scope.row.status] }} </span
+                  >{{ statusMap[scope.row.status] || '-' }}
+                </el-tag>
               </template>
               <VerificationInfo :verification-data="scope.row.verificationData" />
             </el-popover>
           </div>
-          <span v-else>
-            <span class="material-symbols-outlined"> clock_loader_80 </span
-            >{{ statusMap[scope.row.status] || '-' }}</span
-          >
+          <el-tag v-else :type="statusTagsMap[scope.row.status]" effect="light" round>
+            <span class="material-symbols-outlined tags-icon"
+              >{{ statusIconMap[scope.row.status] }} </span
+            >{{ statusMap[scope.row.status] || '-' }}
+          </el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="notAfter" label="有效期限">
@@ -251,7 +256,7 @@ import { TableToolbar } from '@/components/TableToolbarCert'
 import { TableFilterPopover } from '@/components/TableFilterPopover'
 import { apiGetCertsList, apiDeleteCert, apiGetCertTotal, apiUpdateCert } from '@/api/certificate'
 import { ExtendedCertsList, CertsParams } from '@/api/certificate/type'
-import { statusMap, statusOptions, statusImgMap } from './constants'
+import { statusMap, statusOptions, statusImgMap, statusTagsMap, statusIconMap } from './constants'
 import { Pagination } from '@/components/Pagination'
 import { ElMessage } from 'element-plus'
 import { useClipboard } from '@/hooks/web/useClipboard'
@@ -355,11 +360,12 @@ const getList = async () => {
     if (code === 200) {
       // data.list[0] = { ...data.list[0], verificationData: { type: 'file' } }
       // 为验证中的证书添加验证信息弹窗控制
-      tableData.value = data.list.map((item) => ({
-        ...item,
-        verifyVisible: false,
-        verificationData: (item as any).verificationData || null
-      })) as ExtendedCertsList[]
+      // tableData.value = data.list.map((item) => ({
+      //   ...item,
+      //   verifyVisible: false,
+      //   verificationData: (item as any).verificationData || null
+      // })) as ExtendedCertsList[]
+      tableData.value = data.list
       totalRecords.value = data.pagination.total
     }
   } catch {
@@ -682,5 +688,10 @@ const handleCopyDomains = (domains: string[]) => {
 .domain-copy-btn {
   border-radius: 4px;
   margin: auto;
+}
+.tags-icon {
+  font-size: 16px !important;
+  vertical-align: middle;
+  margin-top: -2px;
 }
 </style>
