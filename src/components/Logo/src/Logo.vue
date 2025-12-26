@@ -59,10 +59,6 @@ watch(
       to="/"
     >
       <div class="logo-icon"> <i class="fa-solid fa-file-shield"></i></div>
-      <!-- <img
-        src="@/assets/imgs/logo.png"
-        class="w-[calc(var(--logo-height)-10px)] h-[calc(var(--logo-height)-10px)]"
-      /> -->
       <div
         v-if="show"
         :class="[

@@ -59,7 +59,7 @@ export const asyncRouterMap: AppRouteRecordRaw[] = [
         name: 'certificateManagementList',
         meta: {
           title: '证书管理',
-          icon: 'vi-clarity:document-solid'
+          icon: 'vi-ep:document'
         }
       },
       {
@@ -85,7 +85,7 @@ export const asyncRouterMap: AppRouteRecordRaw[] = [
         name: 'TemplateManagementList',
         meta: {
           title: '模版管理',
-          icon: 'vi-clarity:document-solid'
+          icon: 'vi-ep:lightning'
         }
       }
     ]

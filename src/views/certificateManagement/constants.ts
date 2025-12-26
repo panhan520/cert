@@ -1,9 +1,3 @@
-import status1 from '@/assets/imgs/status1.svg'
-import status2 from '@/assets/imgs/status2.svg'
-import status3 from '@/assets/imgs/status3.svg'
-import status4 from '@/assets/imgs/status4.svg'
-import status5 from '@/assets/imgs/status5.svg'
-
 export const statusMap: Record<string, string> = {
   CERT_STATUS_EXPIRES_SOON: '即将到期(15天内)',
   CERT_STATUS_EXPIRED: '已到期',
@@ -16,13 +10,13 @@ export const statusMap: Record<string, string> = {
 }
 
 export const statusImgMap: Record<string, string> = {
-  CERT_STATUS_EXPIRES_SOON: status3,
-  CERT_STATUS_EXPIRED: status4,
-  CERT_STATUS_ISSUE: status2,
-  CERT_STATUS_ABNORMAL: status5,
-  CERT_STATUS_ALL: status1,
-  CERT_STATUS_VALIDATING: status3,
-  CERT_STATUS_APPLY_FFAIL: status5
+  CERT_STATUS_EXPIRES_SOON: 'e911_emergency',
+  CERT_STATUS_EXPIRED: 'event_busy',
+  CERT_STATUS_ISSUE: 'fact_check',
+  CERT_STATUS_ABNORMAL: 'error',
+  CERT_STATUS_ALL: 'cards_stack',
+  CERT_STATUS_VALIDATING: 'hourglass_bottom',
+  CERT_STATUS_APPLY_FFAIL: 'error'
 }
 
 export const statusTagsMap = {
@@ -71,5 +65,3 @@ export const statusOptions = [
   //   value: 'CERT_STATUS_UNUSED'
   // }
 ]
-
-export { status1, status2, status3, status4 }

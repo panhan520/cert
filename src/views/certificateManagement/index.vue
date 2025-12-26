@@ -9,11 +9,13 @@
         :class="{ active: currentStatus === item.status }"
         @click="handleClickStatus(item.status)"
       >
-        <div>
-          <img :src="statusImgMap[item.status]" alt="" />
-          <span>{{ statusMap[item.status] }}</span>
+        <div class="status-icon" :class="item.status">
+          <span class="material-symbols-outlined">{{ statusImgMap[item.status] }} </span>
         </div>
-        <p>{{ item.total }}</p>
+        <div class="status-text">
+          <span>{{ statusMap[item.status] }}</span>
+          <p>{{ item.total }}</p>
+        </div>
       </li>
     </ul>
     <!-- 按钮+筛选栏 -->
@@ -97,7 +99,7 @@
                 <div class="domain-list-scroll">
                   <div
                     v-for="(item, index) in scope.row.subjectNames.slice(2)"
-                    :key="`popover-${scope.row.id}-${index + 2}`"
+                    :key="`popover-${scope.row.id}-${+index + 2}`"
                     class="domain-list"
                   >
                     <div class="domain-popover-item">
@@ -220,6 +222,9 @@
           </div>
         </template>
       </el-table-column>
+      <template #empty>
+        <el-empty description="暂无数据" />
+      </template>
     </el-table>
     <Pagination
       v-model="queryParams.page"
@@ -540,43 +545,91 @@ const handleCopyDomains = (domains: string[]) => {
 
   li {
     display: flex;
-    flex-direction: column;
     align-items: center;
     cursor: pointer;
     flex: 1 1 0%;
-    height: 92px;
     margin-right: 12px;
-    padding: 16px;
-    background: #f6f7fb;
-    border: 1px solid #e5e8ef;
-    border-radius: 8px 8px 0 0;
-
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #dbdfe7;
     &:last-child {
       margin-right: 0;
     }
-
-    img {
-      width: 12px;
-      margin-right: 4px;
-      vertical-align: middle;
+    .status-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      .material-symbols-outlined {
+        color: #ffffff;
+        font-size: 24px;
+      }
     }
-
-    span {
-      color: #42464e;
+    .CERT_STATUS_ALL {
+      background: radial-gradient(
+        97.22% 97.22% at 2.78% 2.78%,
+        #b6d8ff 0%,
+        #9bc9ff 29.33%,
+        #eaf0ff 66.35%,
+        #b7cbff 100%
+      );
+      .material-symbols-outlined {
+        filter: drop-shadow(0px 0px 2px #007dff);
+      }
+    }
+    .CERT_STATUS_VALIDATING {
+      background: radial-gradient(100% 100% at 0% 0%, #7c89ff 25.48%, #cfd3ff 80.29%);
+      .material-symbols-outlined {
+        filter: drop-shadow(0px 0px 2px #7c89ff);
+      }
+    }
+    .CERT_STATUS_ISSUE {
+      background: radial-gradient(100% 100% at 0% 0%, #47c1c1 25.48%, #a8ebeb 80.29%);
+      .material-symbols-outlined {
+        filter: drop-shadow(0px 0px 2px #47c1c1);
+      }
+    }
+    .CERT_STATUS_EXPIRES_SOON {
+      background: radial-gradient(100% 100% at 0% 0%, #eba149 25.48%, #fbe2c6 80.29%);
+      .material-symbols-outlined {
+        filter: drop-shadow(0px 0px 2px #eba149);
+      }
+    }
+    .CERT_STATUS_EXPIRED {
+      background: radial-gradient(100% 100% at 0% 0%, #909399 25.48%, #dcdfe6 80.29%);
+      .material-symbols-outlined {
+        filter: drop-shadow(0px 0px 2px #a6a6a6);
+      }
+    }
+    .CERT_STATUS_ABNORMAL {
+      background: radial-gradient(100% 100% at 0% 0%, #f56c6c 25.48%, #ffb6b7 80.29%);
+      .material-symbols-outlined {
+        filter: drop-shadow(0px 0px 2px #f56c6c);
+      }
+    }
+    .status-text {
       font-size: 12px;
+      color: #606266;
+      margin-left: 15px;
+      p {
+        margin-top: 4px;
+        font-weight: bold;
+        font-size: 20px;
+        line-height: 20px;
+        color: #303133;
+      }
     }
-
-    p {
-      margin-top: 4px;
-      font-weight: bold;
-      font-size: 28px;
-      line-height: 28px;
-    }
-
     &.active {
-      border-top: 4px solid #1664ff;
-      background: #ffffff;
-      border-bottom: none;
+      background: #007dff;
+      color: #ffffff;
+      .status-text {
+        color: #ffffff;
+        p {
+          color: #ffffff;
+        }
+      }
     }
   }
 }
